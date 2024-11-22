@@ -1,11 +1,12 @@
 /* 基础通用样式 */
-*{
+* {
     box-sizing: border-box;
     margin: 0;
-    font-family: monospace,sans-serif;
+    font-family: monospace, sans-serif;
 }
+
 html {
-    font-size: 10px; 
+    font-size: 10px;
     color: #484040;
     letter-spacing: 2.5px;
 }
@@ -98,7 +99,7 @@ section {
 }
 
 section div {
-    width: 30rem;
+    width: 31rem;
     height: 37rem;
     background-color: rgba(112, 140, 120, 0.238);
     padding: 0rem 1rem 0.5rem 1rem;
@@ -113,13 +114,13 @@ h2 {
     text-align: center;
     border-bottom: solid 0.2rem #484040;
 }
-.start-skill{
+
+.start-skill {
     position: absolute;
     bottom: 2rem;
 }
- 
-.add-skill {
-}
+
+.add-skill {}
 
 aside {
     flex: 2;
@@ -133,32 +134,51 @@ aside {
     aside {
         display: none;
     }
-    section{
+
+    section {
         justify-content: space-around;
     }
+
     .mask .time-show {
         font-size: 5rem;
     }
 }
 
-aside ul li{
+aside ul li {
     list-style-type: none;
     display: inline;
 }
-.subnav{
+
+.subnav {
     flex: 1;
     height: 4rem;
     background-color: darkorange;
     position: sticky;
     top: 0px;
 }
-.back{
 
-}
-.content{
+.back {}
+
+.content {
     overflow: auto;
     flex: 30;
+    padding: 8px;
+    flex-flow: column;
 }
+
+.content li a {
+    text-decoration: none;
+    color: #484040;
+}
+
+.content li a:hover {
+    background-color: #eee;
+}
+
+.content ul {
+    padding-left: 1rem;
+}
+
 /* 侧边栏的功能页 */
 .log-info {
     flex: 1;
@@ -179,32 +199,42 @@ aside ul li{
 }
 
 /* 技能相页关操作 */
-.skill-info{
-    flex:30;
+.skill-info {
+    flex: 30;
     width: 100%;
     height: 100%;
     background-color: rgb(246, 232, 75);
     padding: 1rem 3rem 3rem 3rem;
     overflow: auto;
 }
+
 .skill-form {
     display: grid;
 }
 
-.skill-form fieldset,label{
+.skill-form fieldset,
+label {
     margin-top: 1.5rem;
     font-size: 1.6rem;
 }
+
 .skill-form datalist {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
 }
-.duration{
+
+.duration {
     font-size: 1.4rem;
     color: hotpink;
 }
+
+.author-said {
+    color: lightslategray;
+    margin-top: 2rem;
+}
+
 /* 蒙版样式 */
 .mask {
     position: fixed;
@@ -221,15 +251,17 @@ aside ul li{
     display: flex;
     flex-flow: column wrap;
 }
-.time-show{
+
+.time-show {
     color: aliceblue;
     font-size: 10rem;
 
 }
-.on-off{
 
-}
-.timer-mode,.on-off{
+.on-off {}
+
+.timer-mode,
+.on-off {
     font-size: 2rem;
     border-radius: 40px;
     border-style: hidden;
@@ -237,11 +269,13 @@ aside ul li{
     width: 14rem;
     margin-top: 2rem;
 }
-.mask div{
+
+.mask div {
     flex: 1;
     /* background-color: aqua; */
-    width:100%;
+    width: 100%;
 }
+
 /* 页尾样式 */
 footer {
     height: 5rem;
