@@ -37,14 +37,14 @@ onmessage = (e) => {
         console.log(e.data);
         intervalId3 = setInterval(run3, 1000);
         intervalId4 = setInterval(run4, 1000);
-        console.log('后台计时器执行');        
-    }else{
+        console.log('后台计时器执行');
+    } else {
         clearInterval(intervalId3);
         clearInterval(intervalId4)
         console.log('后台计时器关闭');
         postMessage(time)
     }
-    
+
 
 };
 
