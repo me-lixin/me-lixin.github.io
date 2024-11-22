@@ -29,7 +29,7 @@ formDoc.addEventListener('reset', () => {
     durationDoc[1].textContent = '9';
 })
 formDoc.reset();
-await initalizeDB();
+initalizeDB();
 contentShow();
 // 添加技能按钮
 addSkillDoc.addEventListener('click', () => {
@@ -114,23 +114,40 @@ function updateDataToStore(data) {
         updatePanel(data);
     };
 }
+// const now = new Date(item.startDateTime);
+// const day = new Date(now.getFullYear(),now.getMonth()+1,0);
+
+// function selectSkillLogToStatistics1(range) {
+//     const store = createStore('readonly', 'skillLog');
+//     const index = store.index('dateTime');
+//     let range =IDBKeyRange.Bound(Date.now());;
+//     if (range==='year') {
+//         range = IDBKeyRange.Bound(Date.now());
+//     }
+//     if (range==='month') {
+//         range = IDBKeyRange.Bound(Date.now());
+//     }
+//     index.getAll(range).onsuccess = (e) => {
+//         for (const item of e.target.result) {
+//             const p = document.createElement('p');
+//             let date = new Date(item.endDateTime - item.startDateTime);
+//             p.textContent = `${getNowDate(item.startDateTime)} 学习${item.skillName} ${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()}分钟`;
+//             logInfoDoc.appendChild(p);
+//         }
+//     }
+// }
 function selectSkillLogList() {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
     const range = IDBKeyRange.upperBound(Date.now());
-
     index.getAll(range).onsuccess = (e) => {
         for (const item of e.target.result) {
             const p = document.createElement('p');
             let date = new Date(item.endDateTime - item.startDateTime);
-            p.textContent = `${getNowDate(item.startDateTime)} 学习${item.skillName} ${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()} 分钟`;
+            p.textContent = `${getNowDate(item.startDateTime)} 学习${item.skillName} ${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()}分钟`;
             logInfoDoc.appendChild(p);
-            console.log(item);
-
         }
     }
-
-
 }
 function updateDataToStore2(data) {
     let store = createStore(DB_MODE, 'skillLog');
@@ -149,6 +166,7 @@ function dataToElement(item) {
     constructorPanel(item)
     // }
 }
+
 
 for (const range of rangeDoc) {
     range.addEventListener('input', () => {
@@ -474,3 +492,122 @@ document.addEventListener('visibilitychange', () => {
         // 恢复任务逻辑
     }
 });
+
+// 统计图
+const canvas = document.getElementById('lineChart');
+    const ctx = canvas.getContext('2d');
+    const tooltip = document.getElementById('tooltip');
+
+    // 数据
+    const data = [
+      { date: '2023-11-01', value: 30 },
+      { date: '2023-11-02', value: 50 },
+      { date: '2023-11-03', value: 40 },
+      { date: '2023-11-04', value: 70 },
+      { date: '2023-11-05', value: 60 },
+      { date: '2023-11-06', value: 160 },
+      { date: '2023-11-07', value: 60 }
+
+    ];
+
+    // 图表配置
+    const padding = 50; // 内边距
+    const width = canvas.width - padding * 2; // 绘图区域宽度
+    const height = canvas.height - padding * 2; // 绘图区域高度
+    const pointRadius = 5; // 数据点半径
+
+    // 获取数据范围
+    const xValues = data.map(d => new Date(d.date).getTime());
+    const yValues = data.map(d => d.value);
+    const xMin = Math.min(...xValues);
+    const xMax = Math.max(...xValues);
+    const yMin = Math.min(...yValues);
+    const yMax = Math.max(...yValues);
+
+    // 坐标转换函数
+    const xScale = value => padding + ((value - xMin) / (xMax - xMin)) * width;
+    const yScale = value => canvas.height - padding - ((value - yMin) / (yMax - yMin)) * height;
+
+    // 绘制坐标轴
+    function drawAxes() {
+      ctx.beginPath();
+      ctx.moveTo(padding, padding);
+      ctx.lineTo(padding, canvas.height - padding); // Y 轴
+      ctx.lineTo(canvas.width - padding, canvas.height - padding); // X 轴
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Y 坐标标签
+      const ySteps = 5;
+      for (let i = 0; i <= ySteps; i++) {
+        const yValue = yMin + ((yMax - yMin) / ySteps) * i;
+        const yPos = canvas.height - padding - (height / ySteps) * i;
+        ctx.fillText(yValue.toFixed(0), padding - 30, yPos + 5);
+      }
+
+      // X 坐标标签
+      data.forEach(d => {
+        const xPos = xScale(new Date(d.date).getTime());
+        ctx.fillText(d.date, xPos - 30, canvas.height - padding + 20);
+      });
+    }
+
+    // 绘制折线图
+    function drawLineChart() {
+      ctx.beginPath();
+      ctx.moveTo(xScale(xValues[0]), yScale(yValues[0]));
+      for (let i = 1; i < data.length; i++) {
+        ctx.lineTo(xScale(xValues[i]), yScale(yValues[i]));
+      }
+      ctx.strokeStyle = 'blue';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 绘制数据点
+      data.forEach(d => {
+        ctx.beginPath();
+        ctx.arc(xScale(new Date(d.date).getTime()), yScale(d.value), pointRadius, 0, Math.PI * 2);
+        ctx.fillStyle = 'red';
+        ctx.fill();
+      });
+    }
+
+    // 显示数据点信息
+    canvas.addEventListener('click', event => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      let closestPoint = null;
+      let closestDistance = Infinity;
+
+      data.forEach(d => {
+        const dx = mouseX - xScale(new Date(d.date).getTime());
+        const dy = mouseY - yScale(d.value);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < closestDistance && distance < pointRadius * 2) {
+          closestPoint = d;
+          closestDistance = distance;
+        }
+      });
+
+      if (closestPoint) {
+        tooltip.style.left = `${event.clientX}px`;
+        tooltip.style.top = `${event.clientY - 20}px`;
+        tooltip.textContent = `Date: ${closestPoint.date}, Value: ${closestPoint.value}`;
+        tooltip.style.display = 'block';
+      } else {
+        tooltip.style.display = 'none';
+      }
+    });
+
+    // 初始化图表
+    function initChart() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawAxes();
+      drawLineChart();
+    }
+
+    initChart();

@@ -13,7 +13,7 @@ function run3() {
         time.addUp++;
         time.todayAddUp++;
     }
-    console.log('时间', `${time.h > 9 ? time.h : '0' + time.h}:${time.m > 9 ? time.m : '0' + time.m}:${time.s > 9 ? time.s : '0' + time.s}`);
+    // console.log('时间', `${time.h > 9 ? time.h : '0' + time.h}:${time.m > 9 ? time.m : '0' + time.m}:${time.s > 9 ? time.s : '0' + time.s}`);
 }
 function run4() {
     if (time.m2 == 0 && time.s2 == 0) {
