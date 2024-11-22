@@ -71,7 +71,7 @@ function initalizeDB() {
         console.log('数据库打开');
         db = e.target.result;
         selectDataFromStore();
-selectSkillLogList();
+        selectSkillLogList();
 
 
     }
@@ -88,13 +88,13 @@ selectSkillLogList();
         console.log('数据库构建');
     }
 }
-function createStore(mode,storeName) {
+function createStore(mode, storeName) {
     return mode ? db.transaction(storeName, mode).objectStore(storeName) :
         db.transaction(storeName).objectStore(storeName);
 }
 
 function selectDataFromStore() {
-    let store = createStore('readonly',DB_STORE_NAME);
+    let store = createStore('readonly', DB_STORE_NAME);
     const index = store.index('dateTime');
     index.openCursor().onsuccess = (e) => {
         const cursor = e.target.result
@@ -106,7 +106,7 @@ function selectDataFromStore() {
     console.log('数据加载请求成功');
 }
 function updateDataToStore(data) {
-    let store = createStore(DB_MODE,DB_STORE_NAME)
+    let store = createStore(DB_MODE, DB_STORE_NAME)
     data.dateTime = Date.now();
     store.put(data).onsuccess = (e) => {
         console.log('数据更新成功', e.target.result);
@@ -115,31 +115,31 @@ function updateDataToStore(data) {
     };
 }
 function selectSkillLogList() {
-    const store = createStore('readonly','skillLog');
+    const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
-    const range =IDBKeyRange.upperBound(Date.now());
-    
-    index.getAll(range).onsuccess = (e) =>{
+    const range = IDBKeyRange.upperBound(Date.now());
+
+    index.getAll(range).onsuccess = (e) => {
         for (const item of e.target.result) {
             const p = document.createElement('p');
             let date = new Date(item.endDateTime - item.startDateTime);
-            p.textContent = `${getNowDate(item.startDateTime)} 学习${item.skillName} ${date.getHours() <= 8 ? date.getMinutes() : date.getHours()+'小时'+date.getMinutes()} 分钟`;
+            p.textContent = `${getNowDate(item.startDateTime)} 学习${item.skillName} ${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()} 分钟`;
             logInfoDoc.appendChild(p);
             console.log(item);
-            
+
         }
     }
 
-    
+
 }
 function updateDataToStore2(data) {
-    let store = createStore(DB_MODE,'skillLog');
+    let store = createStore(DB_MODE, 'skillLog');
     data.dateTime = Date.now();
     store.add(data).onsuccess = (e) => {
         console.log('log数据添加成功', e.target.result);
     };
 }
-function logPanel(data){
+function logPanel(data) {
 
 
 }
@@ -316,8 +316,8 @@ function getNowDate(value) {
     // logItem.h=date.getHours();
     // logItem.m=date.getMinutes();
     // logItem.s=date.getSeconds();
-    return `${date.getFullYear()}-${date.getMonth()+1 > 9 ? date.getMonth()+1 : '0'+(date.getMonth()+1)}-${date.getDate() > 9 ? date.getDate() : '0'+date.getDate()} 
-    ${date.getHours()> 9 ? date.getHours() : '0'+date.getHours()}:${date.getMinutes()> 9 ? date.getMinutes() : '0'+date.getMinutes()}:${date.getSeconds()> 9 ? date.getSeconds() : '0'+date.getSeconds()}`
+    return `${date.getFullYear()}-${date.getMonth() + 1 > 9 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)}-${date.getDate() > 9 ? date.getDate() : '0' + date.getDate()} 
+    ${date.getHours() > 9 ? date.getHours() : '0' + date.getHours()}:${date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()}:${date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()}`
 }
 function onOff(obj) {
     if (obj.textContent === '暂停') {
