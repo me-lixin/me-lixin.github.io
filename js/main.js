@@ -506,7 +506,9 @@ const canvas = document.getElementById('lineChart');
       { date: '2023-11-04', value: 70 },
       { date: '2023-11-05', value: 60 },
       { date: '2023-11-06', value: 160 },
-      { date: '2023-11-07', value: 60 }
+      { date: '2023-11-07', value: 60 },
+      { date: '2023-11-08', value: 70 },
+      { date: '2023-11-09', value: 60 }
 
     ];
 
