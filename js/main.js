@@ -512,7 +512,7 @@ const canvas = document.getElementById('lineChart');
 
     ];
 
-    // 图表配置,,,,,
+    // 图表配置
     const padding = 50; // 内边距
     const width = canvas.width - padding * 2; // 绘图区域宽度
     const height = canvas.height - padding * 2; // 绘图区域高度
