@@ -72,8 +72,7 @@ function initalizeDB() {
         db = e.target.result;
         selectDataFromStore();
         selectSkillLogList();
-
-
+        list = selectSkillLogToStatistics(1);
     }
     request.onerror = (e) => {
         alert("请允许我的 web 应用使用 IndexedDB！");
@@ -110,32 +109,66 @@ function updateDataToStore(data) {
     data.dateTime = Date.now();
     store.put(data).onsuccess = (e) => {
         console.log('数据更新成功', e.target.result);
-        console.log('data', data);
         updatePanel(data);
     };
 }
 // const now = new Date(item.startDateTime);
 // const day = new Date(now.getFullYear(),now.getMonth()+1,0);
 
-// function selectSkillLogToStatistics1(range) {
-//     const store = createStore('readonly', 'skillLog');
-//     const index = store.index('dateTime');
-//     let range =IDBKeyRange.Bound(Date.now());;
-//     if (range==='year') {
-//         range = IDBKeyRange.Bound(Date.now());
-//     }
-//     if (range==='month') {
-//         range = IDBKeyRange.Bound(Date.now());
-//     }
-//     index.getAll(range).onsuccess = (e) => {
-//         for (const item of e.target.result) {
-//             const p = document.createElement('p');
-//             let date = new Date(item.endDateTime - item.startDateTime);
-//             p.textContent = `${getNowDate(item.startDateTime)} 学习${item.skillName} ${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()}分钟`;
-//             logInfoDoc.appendChild(p);
-//         }
-//     }
-// }
+// const now = new Date();
+//     console.log(now.getFullYear()-1);
+//     console.log(now.getMonth());
+//     console.log(now.getDate());
+//     console.log(now.getHours());
+//     console.log(now.getMinutes());
+//     console.log(now.getSeconds());
+// const lastYear = new Date(now.getFullYear()-1, now.getMonth(), now.getDate(), now.getHours(),now.getMinutes(),0);
+// console.log(lastYear);
+function selectSkillLogToStatistics(offset) {
+    const store = createStore('readonly', 'skillLog');
+    const index = store.index('dateTime');
+    const now = new Date();
+    const lastMonth = new Date(now.getFullYear()
+        , now.getMonth() - offset
+        , now.getDate(), 0, 0, 0);
+    let list = [];
+    let day = now.getDate();
+    let num = day - 30;
+    for (let i = 0; i < 30; i++) {
+        if (num <= 0) {
+            let lastMaxDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+            let lastDay = lastMaxDay + num;
+            list.push({
+                'label': `${now.getMonth() > 9 ? now.getMonth() : '0' + now.getMonth()}-${lastDay > 9 ? lastDay : '0' + lastDay}`
+                , 'month': now.getMonth() - 1, 'day': lastDay
+            });
+            num++;
+        } else {
+            list.push({
+                'label': `${now.getMonth() + 1 > 9 ? now.getMonth() + 1 : '0' + now.getMonth() + 1}-${num > 9 ? num : '0' + num}`
+                , 'month': now.getMonth(), 'day': num
+            });
+            num++;
+        }
+    }
+    const range = IDBKeyRange.bound(lastMonth.valueOf(), Date.now());
+    index.getAll(range).onsuccess = (e) => {
+        for (let i = 0; i < list.length; i++) {
+            let sum =0;
+            for (const item of e.target.result) {
+                const month = new Date(item.startDateTime).getMonth();
+                const itemDay = new Date(item.startDateTime).getDate();
+                console.log(month,itemDay);  
+                if (month == list[i].month && itemDay == list[i].day) {
+                    sum+=item.duration;
+                }
+            }
+            list[i].data = sum/60/60;
+        }
+    }
+    console.log(list);
+    return list;
+}
 function selectSkillLogList() {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
@@ -149,10 +182,11 @@ function selectSkillLogList() {
         }
     }
 }
+
 function updateDataToStore2(data) {
     let store = createStore(DB_MODE, 'skillLog');
-    data.dateTime = Date.now();
-    store.add(data).onsuccess = (e) => {
+    // data.dateTime = Date.now();
+    store.put(data).onsuccess = (e) => {
         console.log('log数据添加成功', e.target.result);
     };
 }
@@ -488,128 +522,157 @@ document.addEventListener('visibilitychange', () => {
             console.log('时间', e.data);
         }
         console.log('页面激活，恢复任务频率');
-
         // 恢复任务逻辑
     }
 });
 
 // 统计图
+const tooltip = document.querySelector('.tooltip');
+const offscreenCanvas = new OffscreenCanvas(400, 400);
+const offCtx = offscreenCanvas.getContext('2d');
 const canvas = document.getElementById('lineChart');
-    const ctx = canvas.getContext('2d');
-    const tooltip = document.getElementById('tooltip');
+const ctx = canvas.getContext('2d');
+// 数据
+let list;
 
-    // 数据
-    const data = [
-      { date: '2023-11-01', value: 30 },
-      { date: '2023-11-02', value: 50 },
-      { date: '2023-11-03', value: 40 },
-      { date: '2023-11-04', value: 70 },
-      { date: '2023-11-05', value: 60 },
-      { date: '2023-11-06', value: 160 },
-      { date: '2023-11-07', value: 60 },
-      { date: '2023-11-08', value: 70 },
-      { date: '2023-11-09', value: 60 }
+const dataPoints = [100, 2, 3, 4, 5, 600, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+// const dataPoints = [1, 2, 3, 4, 5, 600, 7, 8, 9, 10, 11, 12];
+const labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+// const labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-    ];
+// 绘制坐标系和刻度
+function drawGrid() {
+    const padding = 50;
+    const width = offscreenCanvas.width - padding * 2;
+    const height = offscreenCanvas.height - padding * 2;
+    const stepX = width / (labels.length - 1);
+    const stepY = height / Math.max(...dataPoints);
 
-    // 图表配置
-    const padding = 50; // 内边距
-    const width = canvas.width - padding * 2; // 绘图区域宽度
-    const height = canvas.height - padding * 2; // 绘图区域高度
-    const pointRadius = 5; // 数据点半径
-
-    // 获取数据范围
-    const xValues = data.map(d => new Date(d.date).getTime());
-    const yValues = data.map(d => d.value);
-    const xMin = Math.min(...xValues);
-    const xMax = Math.max(...xValues);
-    const yMin = Math.min(...yValues);
-    const yMax = Math.max(...yValues);
-
-    // 坐标转换函数
-    const xScale = value => padding + ((value - xMin) / (xMax - xMin)) * width;
-    const yScale = value => canvas.height - padding - ((value - yMin) / (yMax - yMin)) * height;
-
-    // 绘制坐标轴
-    function drawAxes() {
-      ctx.beginPath();
-      ctx.moveTo(padding, padding);
-      ctx.lineTo(padding, canvas.height - padding); // Y 轴
-      ctx.lineTo(canvas.width - padding, canvas.height - padding); // X 轴
-      ctx.strokeStyle = '#333';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Y 坐标标签
-      const ySteps = 5;
-      for (let i = 0; i <= ySteps; i++) {
-        const yValue = yMin + ((yMax - yMin) / ySteps) * i;
-        const yPos = canvas.height - padding - (height / ySteps) * i;
-        ctx.fillText(yValue.toFixed(0), padding - 30, yPos + 5);
-      }
-
-      // X 坐标标签
-      data.forEach(d => {
-        const xPos = xScale(new Date(d.date).getTime());
-        ctx.fillText(d.date, xPos - 30, canvas.height - padding + 20);
-      });
-    }
-
-    // 绘制折线图
-    function drawLineChart() {
-      ctx.beginPath();
-      ctx.moveTo(xScale(xValues[0]), yScale(yValues[0]));
-      for (let i = 1; i < data.length; i++) {
-        ctx.lineTo(xScale(xValues[i]), yScale(yValues[i]));
-      }
-      ctx.strokeStyle = 'blue';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // 绘制数据点
-      data.forEach(d => {
-        ctx.beginPath();
-        ctx.arc(xScale(new Date(d.date).getTime()), yScale(d.value), pointRadius, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
-        ctx.fill();
-      });
-    }
-
-    // 显示数据点信息
-    canvas.addEventListener('click', event => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = event.clientX - rect.left;
-      const mouseY = event.clientY - rect.top;
-
-      let closestPoint = null;
-      let closestDistance = Infinity;
-
-      data.forEach(d => {
-        const dx = mouseX - xScale(new Date(d.date).getTime());
-        const dy = mouseY - yScale(d.value);
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < closestDistance && distance < pointRadius * 2) {
-          closestPoint = d;
-          closestDistance = distance;
+    // 绘制 X 轴和 Y 轴
+    offCtx.beginPath();
+    offCtx.moveTo(padding, padding - 15);
+    offCtx.lineTo(padding, offscreenCanvas.height - padding);
+    offCtx.lineTo(offscreenCanvas.width - padding + 15, offscreenCanvas.height - padding);
+    offCtx.strokeStyle = '#000';
+    offCtx.stroke();
+    offCtx.font = '10px monospace';
+    // 绘制 X 轴刻度
+    labels.forEach((label, i) => {
+        const x = padding + i * stepX;
+        if ((i + 1) % 4 == 0) {
+            offCtx.moveTo(x, offscreenCanvas.height - padding)
+            offCtx.lineTo(x, offscreenCanvas.height - padding + 5)
+            offCtx.stroke();
+            offCtx.fillText(label, x - 3, offscreenCanvas.height - padding + 20);
         }
-      });
-
-      if (closestPoint) {
-        tooltip.style.left = `${event.clientX}px`;
-        tooltip.style.top = `${event.clientY - 20}px`;
-        tooltip.textContent = `Date: ${closestPoint.date}, Value: ${closestPoint.value}`;
-        tooltip.style.display = 'block';
-      } else {
-        tooltip.style.display = 'none';
-      }
     });
 
-    // 初始化图表
-    function initChart() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawAxes();
-      drawLineChart();
-    }
+    // 绘制 Y 轴刻度
+    for (let i = 0; i <= Math.max(...dataPoints); i += 20) {
+        const y = offscreenCanvas.height - padding - (i * stepY);
+        if (i % 3 == 0) {
+            offCtx.moveTo(padding - 5, y)
+            offCtx.lineTo(padding, y)
+            offCtx.stroke();
+            offCtx.fillText(i, padding - 30, y + 3);
 
-    initChart();
+        }
+    }
+}
+
+// 绘制折线
+function drawLine() {
+    const padding = 50;
+    const width = offscreenCanvas.width - padding * 2;
+    const height = offscreenCanvas.height - padding * 2;
+    const stepX = width / (labels.length - 1);
+    const stepY = height / Math.max(...dataPoints);
+
+    offCtx.beginPath();
+    offCtx.moveTo(padding, offscreenCanvas.height - padding - (dataPoints[0] * stepY));
+    console.log('kbd',offscreenCanvas.height - padding - (dataPoints[0] * stepY));
+    
+    // 绘制折线
+    dataPoints.forEach((point, i) => {
+        const x = padding + i * stepX;
+        const y = offscreenCanvas.height - padding - (point * stepY);
+        offCtx.lineTo(x, y);
+    });
+
+    offCtx.strokeStyle = '#FF5733'; // 折线颜色
+    offCtx.lineWidth = 2;
+    offCtx.stroke();
+}
+let dataXY = [];
+// 绘制数据点
+function drawDataPoints() {
+    const padding = 50;
+    const width = offscreenCanvas.width - padding * 2;
+    const height = offscreenCanvas.height - padding * 2;
+    const stepX = width / (labels.length - 1);
+    const stepY = height / Math.max(...dataPoints);
+
+    // 绘制每个数据点
+    dataPoints.forEach((point, i) => {
+        const x = padding + i * stepX;
+        const y = offscreenCanvas.height - padding - (point * stepY);
+        dataXY.push({ 'x': x, 'y': y })
+        offCtx.beginPath();
+        offCtx.arc(x, y, 3, 0, 2 * Math.PI);
+        offCtx.fillStyle = '#FF5733';
+        offCtx.fill();
+    });
+}
+// 显示 Tooltip
+function showTooltip(event) {
+    ctx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height)
+    const mouseX = event.offsetX;
+    const mouseY = event.offsetY;
+    if (mouseX < 50 || mouseY < 50 || mouseX > 350 || mouseY > 350) {
+        ctx.drawImage(offscreenCanvas, 0, 0);
+        return;
+    }
+    const padding = 50;
+    const width = offscreenCanvas.width - padding * 2;
+    const height = offscreenCanvas.height - padding * 2;
+    const stepX = width / (labels.length - 1);
+    const stepY = height / Math.max(...dataPoints);
+
+
+    ctx.drawImage(offscreenCanvas, 0, 0);
+    ctx.beginPath();
+    ctx.moveTo(padding, mouseY);
+    ctx.lineTo(offscreenCanvas.width - padding, mouseY);
+    ctx.moveTo(mouseX, padding);
+    ctx.lineTo(mouseX, offscreenCanvas.height - padding);
+    ctx.strokeStyle = '#EEE';
+    ctx.stroke();
+    dataXY.some((item, i) => {
+        if (Math.floor(item.x / 10) == Math.floor(mouseX / 10)) {
+            tooltip.style.display = 'block';
+            tooltip.style.left = `${mouseX + 10}px`;
+            tooltip.style.top = `${mouseY - 30}px`;
+            tooltip.innerText = `${labels[i]}: ${dataPoints[i]}`;
+            return true;
+        } else {
+            tooltip.style.display = 'none';
+        }
+    })
+}
+
+// 初始化绘制
+function initChart() {
+    offCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+    offCtx.font = '12px Arial';
+    drawGrid();
+    drawLine();
+    drawDataPoints();
+    ctx.drawImage(offscreenCanvas, 0, 0);
+
+}
+
+// 监听鼠标移动事件
+canvas.addEventListener('mousemove', showTooltip);
+
+// 初次绘制
+initChart();
