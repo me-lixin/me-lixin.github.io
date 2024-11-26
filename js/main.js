@@ -2,7 +2,7 @@ const addSkillDoc = document.querySelector('.add-skill');
 const asideDoc = document.querySelector('main aside');
 const sectionDoc = document.querySelector('main section');
 const skillInfoDoc = document.querySelector('.skill-info')
-const backDoc = document.querySelector('.back')
+const backDoc = document.querySelector('.return')
 const rangeDoc = document.querySelectorAll('.skill-form input[type="range"]')
 const durationDoc = document.querySelectorAll('.duration')
 const contentDoc = document.querySelector('.content')
@@ -22,7 +22,7 @@ const DB_MODE = 'readwrite';
 let db;
 let dataMap = new Map();
 let currentPanel;
-
+var list=[];
 
 formDoc.addEventListener('reset', () => {
     durationDoc[0].textContent = '600';
@@ -72,7 +72,7 @@ function initalizeDB() {
         db = e.target.result;
         selectDataFromStore();
         selectSkillLogList();
-        list = selectSkillLogToStatistics(1);
+        selectSkillLogToStatistics(1);
     }
     request.onerror = (e) => {
         alert("请允许我的 web 应用使用 IndexedDB！");
@@ -112,18 +112,6 @@ function updateDataToStore(data) {
         updatePanel(data);
     };
 }
-// const now = new Date(item.startDateTime);
-// const day = new Date(now.getFullYear(),now.getMonth()+1,0);
-
-// const now = new Date();
-//     console.log(now.getFullYear()-1);
-//     console.log(now.getMonth());
-//     console.log(now.getDate());
-//     console.log(now.getHours());
-//     console.log(now.getMinutes());
-//     console.log(now.getSeconds());
-// const lastYear = new Date(now.getFullYear()-1, now.getMonth(), now.getDate(), now.getHours(),now.getMinutes(),0);
-// console.log(lastYear);
 function selectSkillLogToStatistics(offset) {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
@@ -131,7 +119,6 @@ function selectSkillLogToStatistics(offset) {
     const lastMonth = new Date(now.getFullYear()
         , now.getMonth() - offset
         , now.getDate(), 0, 0, 0);
-    let list = [];
     let day = now.getDate();
     let num = day - 30;
     for (let i = 0; i < 30; i++) {
@@ -151,23 +138,27 @@ function selectSkillLogToStatistics(offset) {
             num++;
         }
     }
+
     const range = IDBKeyRange.bound(lastMonth.valueOf(), Date.now());
     index.getAll(range).onsuccess = (e) => {
+    console.log(list.length);
+        
         for (let i = 0; i < list.length; i++) {
-            let sum =0;
+            let sum = 0;
             for (const item of e.target.result) {
                 const month = new Date(item.startDateTime).getMonth();
                 const itemDay = new Date(item.startDateTime).getDate();
-                console.log(month,itemDay);  
+                console.log(month, itemDay);
                 if (month == list[i].month && itemDay == list[i].day) {
-                    sum+=item.duration;
+                    sum += item.duration;
                 }
             }
-            list[i].data = sum/60/60;
+            list[i].data = Math.floor(sum / 60 / 60/40);
         }
+        // 初次绘制
+        initChart(15);
     }
     console.log(list);
-    return list;
 }
 function selectSkillLogList() {
     const store = createStore('readonly', 'skillLog');
@@ -317,7 +308,7 @@ function fillPanel(div, data) {
         <li>今天还需学:${data.todayNeedTime || data.todayTime}小时</li>
         <li>距离学会还剩:${data.sumNeedTime || data.skillTime}小时</li>
 </ul>
-<button id=${data.id} type="button" class="start-skill">开始计时</button>`
+<button id=${data.id} type="button" class="start-skill"></button>`
 }
 function fillForm(item) {
     for (const key in item) {
@@ -468,9 +459,11 @@ maskBtDoc.addEventListener('keydown', (e) => {
 
 })
 const liTagDocs = document.querySelectorAll('.content li');
+console.log(liTagDocs);
+
 // 监听a标签
 contentDoc.addEventListener('click', (e) => {
-    console.log(e.target.id);
+    console.log('触发',e.target.id);
     switch (e.target.id) {
         case 'log':
             contentDivDoc[0].style.display = 'block';
@@ -528,25 +521,25 @@ document.addEventListener('visibilitychange', () => {
 
 // 统计图
 const tooltip = document.querySelector('.tooltip');
-const offscreenCanvas = new OffscreenCanvas(400, 400);
+const offscreenCanvas = new OffscreenCanvas(300, 270);
 const offCtx = offscreenCanvas.getContext('2d');
 const canvas = document.getElementById('lineChart');
 const ctx = canvas.getContext('2d');
 // 数据
-let list;
 
-const dataPoints = [100, 2, 3, 4, 5, 600, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+
+const  dataPoints = [100, 2, 3, 4, 5, 600, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
 // const dataPoints = [1, 2, 3, 4, 5, 600, 7, 8, 9, 10, 11, 12];
 const labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
 // const labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 // 绘制坐标系和刻度
-function drawGrid() {
-    const padding = 50;
+function drawGrid(maxData) {
+    const padding = 30;
     const width = offscreenCanvas.width - padding * 2;
     const height = offscreenCanvas.height - padding * 2;
-    const stepX = width / (labels.length - 1);
-    const stepY = height / Math.max(...dataPoints);
+    const stepX = width / (list.length - 1);
+    const stepY = height / maxData;
 
     // 绘制 X 轴和 Y 轴
     offCtx.beginPath();
@@ -557,45 +550,45 @@ function drawGrid() {
     offCtx.stroke();
     offCtx.font = '10px monospace';
     // 绘制 X 轴刻度
-    labels.forEach((label, i) => {
+    list.forEach((item, i) => {
         const x = padding + i * stepX;
         if ((i + 1) % 4 == 0) {
             offCtx.moveTo(x, offscreenCanvas.height - padding)
             offCtx.lineTo(x, offscreenCanvas.height - padding + 5)
             offCtx.stroke();
-            offCtx.fillText(label, x - 3, offscreenCanvas.height - padding + 20);
+            offCtx.fillText(item.day>9?item.day:'0'+item.day, x - 3, offscreenCanvas.height - padding + 20);
         }
     });
 
     // 绘制 Y 轴刻度
-    for (let i = 0; i <= Math.max(...dataPoints); i += 20) {
+    for (let i = 0; i <= maxData; i++) {
         const y = offscreenCanvas.height - padding - (i * stepY);
-        if (i % 3 == 0) {
+        if (i!=0&&i % 3 == 0) {
             offCtx.moveTo(padding - 5, y)
             offCtx.lineTo(padding, y)
             offCtx.stroke();
-            offCtx.fillText(i, padding - 30, y + 3);
+            offCtx.fillText(i>9?i:'0'+i, padding - 22, y + 3);
 
         }
     }
 }
 
 // 绘制折线
-function drawLine() {
-    const padding = 50;
+function drawLine(maxData) {
+    const padding = 30;
     const width = offscreenCanvas.width - padding * 2;
     const height = offscreenCanvas.height - padding * 2;
-    const stepX = width / (labels.length - 1);
-    const stepY = height / Math.max(...dataPoints);
+    const stepX = width / (list.length - 1);
+    const stepY = height / maxData;
 
     offCtx.beginPath();
-    offCtx.moveTo(padding, offscreenCanvas.height - padding - (dataPoints[0] * stepY));
-    console.log('kbd',offscreenCanvas.height - padding - (dataPoints[0] * stepY));
+    offCtx.moveTo(padding, offscreenCanvas.height - padding - (list[0].data * stepY));
+
     
     // 绘制折线
-    dataPoints.forEach((point, i) => {
+    list.forEach((point, i) => {
         const x = padding + i * stepX;
-        const y = offscreenCanvas.height - padding - (point * stepY);
+        const y = offscreenCanvas.height - padding - (point.data * stepY);
         offCtx.lineTo(x, y);
     });
 
@@ -605,17 +598,17 @@ function drawLine() {
 }
 let dataXY = [];
 // 绘制数据点
-function drawDataPoints() {
-    const padding = 50;
+function drawDataPoints(maxData) {
+    const padding = 30;
     const width = offscreenCanvas.width - padding * 2;
     const height = offscreenCanvas.height - padding * 2;
-    const stepX = width / (labels.length - 1);
-    const stepY = height / Math.max(...dataPoints);
+    const stepX = width / (list.length - 1);
+    const stepY = height / maxData;
 
     // 绘制每个数据点
-    dataPoints.forEach((point, i) => {
+    list.forEach((point, i) => {
         const x = padding + i * stepX;
-        const y = offscreenCanvas.height - padding - (point * stepY);
+        const y = offscreenCanvas.height - padding - (point.data * stepY);
         dataXY.push({ 'x': x, 'y': y })
         offCtx.beginPath();
         offCtx.arc(x, y, 3, 0, 2 * Math.PI);
@@ -625,18 +618,20 @@ function drawDataPoints() {
 }
 // 显示 Tooltip
 function showTooltip(event) {
+    const padding = 30;
     ctx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height)
     const mouseX = event.offsetX;
     const mouseY = event.offsetY;
-    if (mouseX < 50 || mouseY < 50 || mouseX > 350 || mouseY > 350) {
+    if (mouseX < padding || mouseY < padding || mouseX > canvas.width || mouseY > canvas.height) {
         ctx.drawImage(offscreenCanvas, 0, 0);
+        tooltip.style.display = 'none';
+
         return;
     }
-    const padding = 50;
     const width = offscreenCanvas.width - padding * 2;
     const height = offscreenCanvas.height - padding * 2;
-    const stepX = width / (labels.length - 1);
-    const stepY = height / Math.max(...dataPoints);
+    const stepX = width / (list.length - 1);
+    const stepY = height / list.length == 12 ? 450 : 15;
 
 
     ctx.drawImage(offscreenCanvas, 0, 0);
@@ -652,7 +647,7 @@ function showTooltip(event) {
             tooltip.style.display = 'block';
             tooltip.style.left = `${mouseX + 10}px`;
             tooltip.style.top = `${mouseY - 30}px`;
-            tooltip.innerText = `${labels[i]}: ${dataPoints[i]}`;
+            tooltip.innerText = `${list[i].label}: ${list[i].data}h`;
             return true;
         } else {
             tooltip.style.display = 'none';
@@ -661,12 +656,12 @@ function showTooltip(event) {
 }
 
 // 初始化绘制
-function initChart() {
+function initChart(maxData) {
     offCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
     offCtx.font = '12px Arial';
-    drawGrid();
-    drawLine();
-    drawDataPoints();
+    drawGrid(maxData);
+    drawLine(maxData);
+    drawDataPoints(maxData);
     ctx.drawImage(offscreenCanvas, 0, 0);
 
 }
@@ -674,5 +669,4 @@ function initChart() {
 // 监听鼠标移动事件
 canvas.addEventListener('mousemove', showTooltip);
 
-// 初次绘制
-initChart();
+
