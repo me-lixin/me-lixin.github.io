@@ -3,6 +3,7 @@
     box-sizing: border-box;
     margin: 0;
     font-family: monospace, sans-serif;
+    border-radius: 20px;
 }
 
 html {
@@ -12,10 +13,13 @@ html {
 }
 
 body {
+    border-radius: 1rem;
     min-width: 32rem;
     padding: 0.5rem;
     margin: 0.5rem;
-    background-color: #eee;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.7)), center / cover no-repeat url('../images/background.jpg');
 }
 
 p,
@@ -29,39 +33,58 @@ label {
 
 /* 页面两条分割线 */
 header,
-main {
-    border-bottom: rgb(144, 154, 224);
-    border-bottom-style: solid;
-    border-bottom-width: 0.4rem;
+main,
+footer {
+    margin-bottom: 10px;
+    box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
 }
 
 /* 头部样式 */
 header {
-    background-color: aqua;
+    /* background-color: aqua; */
+    /* background-color: #d5cece; */
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0.1));
     min-height: 7rem;
-    padding: 0 1rem 0 1rem;
+    padding: 0 0.5rem 0 1rem;
     display: flex;
     flex-flow: row wrap;
     position: sticky;
     top: 0px;
-    z-index: 1;
+    z-index: 99;
 }
 
 header img {
     width: 6rem;
     height: 6rem;
-
 }
 
-header .right-menu {
+header .right {
     flex: 1 320px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
+header .right-menu {
+    flex: 1 100px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 1.7rem;
+}
+
+.menu {
+    width: 3.2rem;
+    height: 3.2rem;
+    border-style: hidden;
+    background: center / 68% 68% no-repeat url('../images/menu.svg'), #565858;
+
+}
+
 header .logo-title {
-    flex: 1 200px;
+    flex: 1 220px;
     align-self: baseline;
     padding: 1rem;
     display: flex;
@@ -83,25 +106,29 @@ header h1 {
 main {
     height: 65rem;
     display: flex;
-    background-color: aliceblue;
+    gap: 1rem;
+    /* background-color: aliceblue; */
 }
 
 section {
-    flex: 4;
+    flex: 5;
     display: flex;
     flex-flow: row wrap;
-    background-color: rgb(158, 107, 107);
+    /* background-color: rgb(158, 107, 107); */
     overflow: auto;
     justify-content: start;
     gap: 1rem;
     line-height: 3.2rem;
-
+    box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
+    padding: 1rem;
 }
 
 section div {
+    box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
+
     width: 31rem;
     height: 37rem;
-    background-color: rgba(112, 140, 120, 0.238);
+    /* background-color: rgba(112, 140, 120, 0.238); */
     padding: 0rem 1rem 0.5rem 1rem;
     overflow: auto;
     position: relative;
@@ -118,15 +145,29 @@ h2 {
 .start-skill {
     position: absolute;
     bottom: 2rem;
+    width: 5rem;
+    height: 5rem;
+    border-style: hidden;
+    background: center / 100% 100% no-repeat url('../images/start.svg');
+
 }
 
-.add-skill {}
+.add-skill {
+    width: 3.2rem;
+    height: 3.2rem;
+    border-style: hidden;
+    background: center / 70% 70% no-repeat url(../images/add.svg), green;
+
+}
 
 aside {
+    box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
+    padding: 1rem;
     flex: 2;
-    background-color: red;
+    /* background-color: red; */
     display: flex;
     flex-direction: column;
+    gap: 0.7rem;
 }
 
 /* 浏览器视口宽度小于450px的时候隐藏的侧边栏,在需要的时候展示侧边栏内容 */
@@ -145,6 +186,7 @@ aside {
 }
 
 aside ul li {
+    padding: 0.5rem;
     list-style-type: none;
     display: inline;
 }
@@ -152,36 +194,47 @@ aside ul li {
 .subnav {
     flex: 1;
     height: 4rem;
-    background-color: darkorange;
+    /* background-color: darkorange; */
     position: sticky;
-    top: 0px;
+    top: 9rem;
 }
 
-.back {}
+.return {
+    width: 3.2rem;
+    height: 3.2rem;
+    border-style: hidden;
+    background: center / 68% 68% no-repeat url('../images/return.svg'), #565858;
+}
+
+.return:hover,
+.add-skill:hover,
+.menu:hover,
+.start-skill:hover,
+.submit:hover {
+    cursor: pointer;
+    border: solid 1px white;
+}
 
 .content {
+    box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
     overflow: auto;
     flex: 30;
     padding: 8px;
     flex-flow: column;
 }
 
-.content li a {
-    text-decoration: none;
-    color: #484040;
-}
 
-.content li a:hover {
+.content li:hover {
     background-color: #eee;
 }
 
 .content ul {
+
     padding-left: 1rem;
+
 }
 
-canvas {
-    border: 1px solid black;
-}
+canvas {}
 
 .tooltip {
     position: absolute;
@@ -194,38 +247,53 @@ canvas {
 
 /* 侧边栏的功能页 */
 .log-info {
+    /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
+    padding: 1rem;
     flex: 1;
     display: none;
-    background-color: rgb(105, 210, 191);
+    /* background-color: rgb(105, 210, 191); */
 
 }
 
 .statistics {
+    padding: 1rem;
+
+    /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
+
     flex: 1;
-    background-color: rgb(140, 164, 216);
+    /* background-color: rgb(140, 164, 216); */
     position: relative;
+    text-align: center;
+
 }
 
 .instruction {
+    padding: 2rem;
+
+    /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
+
     flex: 1;
     display: none;
 
-    background-color: rgb(53, 160, 29);
+    /* background-color: rgb(53, 160, 29); */
 
 }
 
 /* 技能相页关操作 */
 .skill-info {
+    box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
+
     flex: 30;
     width: 100%;
     height: 100%;
-    background-color: rgb(246, 232, 75);
+    /* background-color: rgb(246, 232, 75); */
     padding: 1rem 3rem 3rem 3rem;
     overflow: auto;
 }
 
 .skill-form {
     display: grid;
+    border-radius: 1rem;
 }
 
 .skill-form fieldset,
@@ -240,7 +308,9 @@ label {
     justify-content: space-between;
     width: 100%;
 }
-
+.skill-form input {
+    border-radius: 0.5rem;
+}
 .duration {
     font-size: 1.4rem;
     color: hotpink;
@@ -250,27 +320,33 @@ label {
     color: lightslategray;
     margin-top: 2rem;
 }
+.submit{
+    margin-top: 1rem;
+    border-style: hidden;
+}
+
 
 /* 蒙版样式 */
 .mask {
     position: fixed;
     top: 0px;
     left: 0px;
-    background: rgba(0, 0, 0, 0.5);
     width: 100vw;
     height: 100vh;
     min-width: 32rem;
-    z-index: 3;
+    z-index: 9999;
     visibility: hidden;
     text-align: center;
     align-content: center;
     display: flex;
     flex-flow: column wrap;
+    border-radius: 0;
+    background: center / cover no-repeat url('../images/background.jpg');
 }
 
 .time-show {
     color: aliceblue;
-    font-size: 10rem;
+    font-size: 9rem;
 
 }
 
@@ -295,5 +371,5 @@ label {
 /* 页尾样式 */
 footer {
     height: 5rem;
-    background-color: rebeccapurple;
+    /* background-color: rebeccapurple; */
 }
