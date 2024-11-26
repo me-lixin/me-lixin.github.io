@@ -22,6 +22,20 @@ body {
             rgba(255, 255, 255, 0.7)), center / cover no-repeat url('../images/background.jpg');
 }
 
+body button:hover {
+    cursor: pointer;
+    border: solid 0.1rem white;
+}
+/* 隐藏类 */
+.display-none{
+
+}
+.display-block{
+
+}
+.display-flex{
+
+}
 p,
 li,
 ul,
@@ -29,7 +43,12 @@ button,
 label {
     font-size: 1.7rem;
 }
-
+b{
+    color: #05586e;
+}
+strong{
+    color: #a22a2a;
+}
 
 /* 页面两条分割线 */
 header,
@@ -47,7 +66,7 @@ header {
             rgba(255, 255, 255, 0.1),
             rgba(255, 255, 255, 0.1));
     min-height: 7rem;
-    padding: 0 0.5rem 0 1rem;
+    padding: 0 2rem 0 1rem;
     display: flex;
     flex-flow: row wrap;
     position: sticky;
@@ -72,7 +91,7 @@ header .right-menu {
     display: flex;
     align-items: center;
     justify-content: end;
-    gap: 1.7rem;
+    gap: 1rem;
 }
 
 .menu {
@@ -148,8 +167,6 @@ h2 {
     width: 5rem;
     height: 5rem;
     border-style: hidden;
-    background: center / 100% 100% no-repeat url('../images/start.svg');
-
 }
 
 .add-skill {
@@ -206,15 +223,6 @@ aside ul li {
     background: center / 68% 68% no-repeat url('../images/return.svg'), #565858;
 }
 
-.return:hover,
-.add-skill:hover,
-.menu:hover,
-.start-skill:hover,
-.submit:hover {
-    cursor: pointer;
-    border: solid 1px white;
-}
-
 .content {
     box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
     overflow: auto;
@@ -223,18 +231,24 @@ aside ul li {
     flex-flow: column;
 }
 
-
 .content li:hover {
-    background-color: #eee;
+    cursor: pointer;
+    border: solid 0.1rem #eee;
 }
 
 .content ul {
-
     padding-left: 1rem;
-
 }
 
-canvas {}
+.switch {
+    width: 3rem;
+    height: 3rem;
+    border-style: hidden;
+    border-radius: 1.2rem;
+    position: absolute;
+    right: 1.5rem;
+    font-size: 1.4rem;
+}
 
 .tooltip {
     position: absolute;
@@ -250,9 +264,12 @@ canvas {}
     /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
     padding: 1rem;
     flex: 1;
-    display: none;
     /* background-color: rgb(105, 210, 191); */
-
+}
+.log-info p{
+    font-size: 1.2rem;
+    letter-spacing: 0.1rem;
+    line-height: 2.5rem;
 }
 
 .statistics {
@@ -273,7 +290,6 @@ canvas {}
     /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
 
     flex: 1;
-    display: none;
 
     /* background-color: rgb(53, 160, 29); */
 
@@ -308,19 +324,22 @@ label {
     justify-content: space-between;
     width: 100%;
 }
+
 .skill-form input {
     border-radius: 0.5rem;
 }
+
 .duration {
     font-size: 1.4rem;
-    color: hotpink;
+    color: #a22a2a;
 }
 
 .author-said {
     color: lightslategray;
     margin-top: 2rem;
 }
-.submit{
+
+.submit {
     margin-top: 1rem;
     border-style: hidden;
 }
@@ -350,16 +369,42 @@ label {
 
 }
 
-.on-off {}
+.off {
+    background: center / 95% 95% no-repeat url('../images/stop.svg');
+}
 
-.timer-mode,
+.on {
+    background: center / 100% 100% no-repeat url('../images/start.svg');
+}
+
+.increase {
+    background: left 12px/ 50% 50% no-repeat url('../images/increase.svg');
+}
+
+.reduce {
+    background: left 12px/ 50% 50% no-repeat url('../images/reduce.svg');
+
+}
+
 .on-off {
+    border-style: hidden;
+    padding: 1.5rem;
+    width: 10rem;
+    height: 10rem;
+    margin-top: 2rem;
+    background-color: white;
+    border-radius: 5rem;
+}
+
+.timer-mode {
     font-size: 2rem;
     border-radius: 40px;
     border-style: hidden;
-    padding: 1.5rem;
+    padding: 1.5rem 0 1.5rem 3.5rem;
     width: 14rem;
     margin-top: 2rem;
+    background-color: white;
+    opacity: 0.5;   
 }
 
 .mask div {
