@@ -22,7 +22,7 @@
             <p class="ambition">人差一口气,气吞山河的气</p>
             <div class="right-menu">
 
-                <button class="add-skill"></button>
+                <button class="add-skill" type="button"></button>
                 <button class="menu" type="button"></button>
             </div>
         </div>
@@ -67,15 +67,16 @@
             </div>
             <div class="content">
                 <ul>
-                    <li>日志</li>
-                    <li>统计</li>
-                    <li>说明</li>
+                    <li id="log">日志</li>
+                    <li id="statistics">统计</li>
+                    <li id="instructions">说明</li>
                 </ul>
                 <div class="log-info">
                 </div>
                 <div class="statistics">
-                    <canvas id="lineChart" width="290" height="260"></canvas>
+                    <canvas id="lineChart" width="300" height="260"></canvas>
                     <div class="tooltip"></div>
+                    <button class="switch" type="button">年</button>
                 </div>
                 <div class="instruction">
                     <p>
@@ -102,7 +103,7 @@
             <p class="time-show"></p>
         </div>
         <div>
-            <button class="on-off" type="button"></button>
+            <button id="onOff" class="on-off" type="button"></button>
         </div>
     </div>
 </body>
