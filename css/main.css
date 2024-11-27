@@ -1,3 +1,12 @@
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+@font-face {
+    font-family: "alimama";
+    font-weight: 400;
+    src: url("//at.alicdn.com/wf/webfont/5hj1UzPIOh1C/C0d4L3m0pMiN.woff2") format("woff2"),
+        url("//at.alicdn.com/wf/webfont/5hj1UzPIOh1C/eI29w0dx4P8i.woff") format("woff");
+    font-display: swap;
+}
+
 /* 基础通用样式 */
 * {
     box-sizing: border-box;
@@ -26,16 +35,14 @@ body button:hover {
     cursor: pointer;
     border: solid 0.1rem white;
 }
+
 /* 隐藏类 */
-.display-none{
+.display-none {}
 
-}
-.display-block{
+.display-block {}
 
-}
-.display-flex{
+.display-flex {}
 
-}
 p,
 li,
 ul,
@@ -43,10 +50,12 @@ button,
 label {
     font-size: 1.7rem;
 }
-b{
+
+b {
     color: #05586e;
 }
-strong{
+
+strong {
     color: #a22a2a;
 }
 
@@ -62,9 +71,10 @@ footer {
 header {
     /* background-color: aqua; */
     /* background-color: #d5cece; */
-    background: linear-gradient(to bottom,
-            rgba(255, 255, 255, 0.1),
-            rgba(255, 255, 255, 0.1));
+
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.7)),
+        center/ cover no-repeat url(../images/background.jpg);
     min-height: 7rem;
     padding: 0 2rem 0 1rem;
     display: flex;
@@ -113,12 +123,15 @@ header .logo-title {
 header .ambition {
     text-align: center;
     display: inline-block;
+    font-family: alimama, monospace;
+
 }
 
 
 header h1 {
     font-size: 2.6rem;
     margin-top: 2.4rem;
+    font-family: alimama,monospace;
 }
 
 /* 内容体样式 */
@@ -126,6 +139,7 @@ main {
     height: 65rem;
     display: flex;
     gap: 1rem;
+    box-shadow: none;
     /* background-color: aliceblue; */
 }
 
@@ -179,12 +193,13 @@ h2 {
 
 aside {
     box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
-    padding: 1rem;
+    /* padding: 1rem; */
     flex: 2;
     /* background-color: red; */
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
+    position: relative;
 }
 
 /* 浏览器视口宽度小于450px的时候隐藏的侧边栏,在需要的时候展示侧边栏内容 */
@@ -206,14 +221,16 @@ aside ul li {
     padding: 0.5rem;
     list-style-type: none;
     display: inline;
+
 }
 
 .subnav {
-    flex: 1;
-    height: 4rem;
-    /* background-color: darkorange; */
+    padding: 12px;
+    height: 5rem;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), center / cover no-repeat url(../images/background.jpg);
     position: sticky;
-    top: 9rem;
+    top: 0rem;
+    border-radius: 20px 20px 0px 0px;
 }
 
 .return {
@@ -221,13 +238,16 @@ aside ul li {
     height: 3.2rem;
     border-style: hidden;
     background: center / 68% 68% no-repeat url('../images/return.svg'), #565858;
+    position: absolute;
+    z-index: 1;
+    left: 8px;
+    top: 7px;
 }
 
 .content {
-    box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
-    overflow: auto;
+    /* box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2; */
     flex: 30;
-    padding: 8px;
+    /* padding: 8px; */
     flex-flow: column;
 }
 
@@ -237,7 +257,7 @@ aside ul li {
 }
 
 .content ul {
-    padding-left: 1rem;
+    padding-left: 5rem;
 }
 
 .switch {
@@ -264,9 +284,11 @@ aside ul li {
     /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
     padding: 1rem;
     flex: 1;
+    overflow: auto;
     /* background-color: rgb(105, 210, 191); */
 }
-.log-info p{
+
+.log-info p {
     font-size: 1.2rem;
     letter-spacing: 0.1rem;
     line-height: 2.5rem;
@@ -274,6 +296,7 @@ aside ul li {
 
 .statistics {
     padding: 1rem;
+    overflow: auto;
 
     /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
 
@@ -286,6 +309,7 @@ aside ul li {
 
 .instruction {
     padding: 2rem;
+    overflow: auto;
 
     /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
 
@@ -297,7 +321,7 @@ aside ul li {
 
 /* 技能相页关操作 */
 .skill-info {
-    box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
+    /* box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2; */
 
     flex: 30;
     width: 100%;
@@ -404,7 +428,7 @@ label {
     width: 14rem;
     margin-top: 2rem;
     background-color: white;
-    opacity: 0.5;   
+    opacity: 0.5;
 }
 
 .mask div {
@@ -416,5 +440,9 @@ label {
 /* 页尾样式 */
 footer {
     height: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     /* background-color: rebeccapurple; */
 }
