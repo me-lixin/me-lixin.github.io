@@ -488,29 +488,29 @@ maskBtDoc.addEventListener('keydown', (e) => {
 const liTagDocs = document.querySelectorAll('.content li');
 console.log(liTagDocs);
 
-// 监听a标签
+// 监听标签切换
 contentDoc.addEventListener('click', (e) => {
     switch (e.target.id) {
         case 'log':
-            contentDivDoc[0].style.display = 'block';
-            contentDivDoc[1].style.display = 'none';
+            contentDivDoc[1].style.display = 'block';
             contentDivDoc[2].style.display = 'none';
+            contentDivDoc[3].style.display = 'none';
             liTagDocs[0].style.background = '#EEE';
             liTagDocs[1].style.background = 'inherit';
             liTagDocs[2].style.background = 'inherit';
             break;
         case 'statistics':
-            contentDivDoc[0].style.display = 'none';
-            contentDivDoc[1].style.display = 'block';
-            contentDivDoc[2].style.display = 'none';
+            contentDivDoc[1].style.display = 'none';
+            contentDivDoc[2].style.display = 'block';
+            contentDivDoc[3].style.display = 'none';
             liTagDocs[0].style.background = 'inherit';
             liTagDocs[1].style.background = '#EEE';
             liTagDocs[2].style.background = 'inherit';
             break;
         case 'instructions':
-            contentDivDoc[0].style.display = 'none';
             contentDivDoc[1].style.display = 'none';
-            contentDivDoc[2].style.display = 'block';
+            contentDivDoc[2].style.display = 'none';
+            contentDivDoc[3].style.display = 'block';
             liTagDocs[0].style.background = 'inherit';
             liTagDocs[1].style.background = 'inherit';
             liTagDocs[2].style.background = '#EEE';
