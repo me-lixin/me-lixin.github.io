@@ -17,6 +17,8 @@ const DB_NAME = 'skillManage';
 const DB_VERSION = 4;
 const DB_STORE_NAME = 'skill';
 const DB_MODE = 'readwrite';
+const MILLISECOND = 86400000;
+
 //全局
 let db;
 let dataMap = new Map();
@@ -26,14 +28,19 @@ var list = [];
 formDoc.addEventListener('reset', () => {
     durationDoc[0].textContent = '600';
     durationDoc[1].textContent = '9';
+    for (const item of formDoc) {
+        if (item.type==='hidden') {
+            item.value = 0;
+        }
+    }
 })
 formDoc.reset();
 initalizeDB();
 contentShow();
 // 添加技能按钮
 addSkillDoc.addEventListener('click', () => {
-    let hiddenNode = formDoc.lastChild
-    if (hiddenNode.type === 'hidden') {
+    let hiddenNode = document.querySelector('#id')
+    if(hiddenNode){
         hiddenNode.parentNode.removeChild(hiddenNode);
     }
     formDoc.reset();
@@ -64,15 +71,34 @@ formDoc.addEventListener('submit', (e) => {
     }
     updateDataToStore(Object.fromEntries(formData))
 })
+let q='9'
+console.log(Number(q)+1);
+
+//默认数据填充
+function defaultDataFill(data) {
+    data.dateTime = Date.now();
+    data.todayNeedTime = Number(data.todayTime)*1000*60*60  - Number(data.todayAddUp);
+    data.sumNeedTime = Number(data.skillTime)*1000*60*60 - Number(data.addUp);
+    data.h = data.h || 0;
+    data.m = data.m || 0;
+    data.sm = data.sm || 0;
+    data.s = data.s || 0;
+    data.h2 = Math.trunc((Number(data.todayTime)*1000*60*60 - Number(data.todayAddUp))/1000/60/60); 
+    data.m2 = data.m2 || 0;
+    data.s2 = data.s2 || 0;
+    data.timerMode = data.timerMode || '0';
+    data.addUp = data.addUp || 0;
+    data.todayAddUp = data.todayAddUp || 0;
+}
 function initalizeDB() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onsuccess = (e) => {
         console.log('数据库打开');
         db = e.target.result;
         selectDataFromStore();
-        selectSkillLogList();
         selectSkillLogToStatistics(1);
         switchTag('log');
+        selectSkillLogList(Date.now() - MILLISECOND, Date.now());
     }
     request.onerror = (e) => {
         alert("请允许我的 web 应用使用 IndexedDB！");
@@ -106,12 +132,10 @@ function selectDataFromStore() {
 }
 function updateDataToStore(data) {
     let store = createStore(DB_MODE, DB_STORE_NAME)
-    data.dateTime = Date.now();
-    data.todayNeedTime = data.todayTime - (data.todayAddUp || 0);
-    data.sumNeedTime = data.skillTime - (data.addUp || 0);
+    defaultDataFill(data);
     store.put(data).onsuccess = (e) => {
         console.log('数据更新成功', e.target.result);
-        updatePanel(data);
+        dataToElement(data);
     };
 }
 function selectSkillLogToStatistics(offset) {
@@ -196,30 +220,22 @@ function selectSkillLogToStatistics(offset) {
 function selectSkillLogList(startTime, endTime) {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
-    startTime = new Date(2024, 9, 0).valueOf();
-    endTime = Date.now();
     const range = IDBKeyRange.bound(startTime, endTime);
+    //index.openCursor(range, 'prev')降序查询
+    const title = document.createElement('p');
+    title.innerHTML = `<strong>${getNowDate(endTime)}</strong>`;
+    loading.before(title);
     index.openCursor(range, 'prev').onsuccess = (e) => {
         const cursor = e.target.result
-
-
         if (cursor) {
-            // console.log('log', new Date(cursor.value.dateTime));
             let item = cursor.value
-            const p = document.createElement('p');
+            const content = document.createElement('p');
             let date = new Date(item.endDateTime - item.startDateTime);
-            p.innerHTML = `[${getNowDate(item.startDateTime)}] 学习<strong>[${item.skillName}]</strong> <b>${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()}</b>分钟`;
-            logInfoDoc.appendChild(p);
+            content.innerHTML = `[${getNowTime(item.startDateTime)}] 学习<strong>[${item.skillName}]</strong> <b>${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()}</b>分钟`;
+            //在loading标签前面插入
+            loading.before(content);
             cursor.continue();
-
         }
-        // for (const item of e.target.result) {
-
-        //     const p = document.createElement('p');
-        //     let date = new Date(item.endDateTime - item.startDateTime);
-        //     p.innerHTML = `[${getNowDate(item.startDateTime)}] 学习<strong>${item.skillName}</strong> <b>${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()}</b>分钟`;
-        //     logInfoDoc.appendChild(p);
-        // }
     }
 }
 
@@ -253,63 +269,55 @@ function updateDuration(range) {
     }
 }
 
-function updatePanel(data) {
-
-    const div = document.getElementById(data.id) || document.createElement('div');
-
-    fillPanel(div, data);
-    sectionDoc.prepend(div);
-
-}
 // 动态面板
 function constructorPanel(data) {
-    const div = document.createElement('div');
+    const div = document.getElementById(data.id) || document.createElement('div');
+
     div.setAttribute('id', data.id)
     fillPanel(div, data);
     sectionDoc.prepend(div);
-    // sectionDoc.appendChild(div);
-
-    div.addEventListener('click', (e) => {
-        if (e.target.type === 'button') {
-            maskBtDoc.style.visibility = 'visible';
-            maskBtDoc.focus();
-            currentPanel = dataMap.get(e.currentTarget.id)
-            currentPanel.h = currentPanel.h || 0;
-            currentPanel.m = currentPanel.m || 0;
-            currentPanel.s = currentPanel.s || 0;
-            currentPanel.h2 = currentPanel.h2 || currentPanel.todayTime;
-            currentPanel.m2 = currentPanel.m2 || 0;
-            currentPanel.s2 = currentPanel.s2 || 0;
-            currentPanel.timerMode = currentPanel.timerMode || 'R';
-            currentPanel.sumNeedTime = currentPanel.sumNeedTime || currentPanel.skillTime;
-            currentPanel.todayNeedTime = currentPanel.todayNeedTime || currentPanel.todayTime;
-            currentPanel.addUp = currentPanel.addUp || 1;
-            currentPanel.todayAddUp = currentPanel.todayAddUp || 1;
-            onOffDoc.value = 'on';
-            timeShows[0].textContent = `${currentPanel.h > 9 ? currentPanel.h : '0' + currentPanel.h}:${currentPanel.m > 9 ? currentPanel.m : '0' + currentPanel.m}:${currentPanel.s > 9 ? currentPanel.s : '0' + currentPanel.s}`;
-            timeShows[1].textContent = `${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
-
-            if (currentPanel.timerMode === 'R') {
-                timerBtMode.textContent = '倒计时';
-                timerBtMode.className = 'timer-mode reduce'
-
-                maskDivDocs[1].style.display = 'block';
-                maskDivDocs[2].style.display = 'none';
-            } else {
-                timerBtMode.textContent = '正计时';
-                timerBtMode.className = 'timer-mode increase'
-
-                maskDivDocs[1].style.display = 'none';
-                maskDivDocs[2].style.display = 'block';
-            }
-            onOff(onOffDoc);
-        }
-        fillForm(dataMap.get(e.currentTarget.id))
-        contentShow('skill');
-
-    })
 }
 
+sectionDoc.addEventListener('click', (e) => {
+    let divDoc;
+    if(e.target.id){
+        divDoc = e.target;
+    }
+    if(e.target.parentNode.id){
+        divDoc = e.target.parentNode;
+    }
+    if(e.target.parentNode.parentNode.id){
+        divDoc = e.target.parentNode.parentNode;
+    }
+    if(e.target.parentNode.parentNode.parentNode.id){
+        divDoc = e.target.parentNode.parentNode.parentNode;
+    }
+    if (e.target.type === 'button') {
+        maskBtDoc.style.visibility = 'visible';
+        maskBtDoc.focus();
+        currentPanel = dataMap.get(divDoc.id)
+        onOffDoc.value = 'on';
+        timeShows[0].textContent = `${currentPanel.h > 9 ? currentPanel.h : '0' + currentPanel.h}:${currentPanel.m > 9 ? currentPanel.m : '0' + currentPanel.m}:${currentPanel.s > 9 ? currentPanel.s : '0' + currentPanel.s}`;
+        timeShows[1].textContent = `${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
+
+        if (currentPanel.timerMode === '0') {
+            timerBtMode.textContent = '倒计时';
+            timerBtMode.className = 'timer-mode reduce'
+            maskDivDocs[1].classList.toggle('display-none',false);
+            maskDivDocs[2].classList.toggle('display-none',true);
+        } else {
+            timerBtMode.textContent = '正计时';
+            timerBtMode.className = 'timer-mode increase'
+            maskDivDocs[1].classList.toggle('display-none',true);
+            maskDivDocs[2].classList.toggle('display-none',false);
+        }
+        onOff(onOffDoc);
+    }
+    
+    fillForm(dataMap.get(divDoc.id))
+    contentShow('skill');
+
+})
 function contentShow(type) {
     switch (type) {
         case 'skill':
@@ -348,13 +356,13 @@ function fillPanel(div, data) {
     <h2>${data.skillName}</h2>
     <p>你要用<b>${data.skillTime}</b>个小时来学<strong>[${data.skillName}]</strong>,要是学不会,你将<b>[生不如死]</b>!</p>
     <ul>
-        <li>累计学习:<b>${data.addUp || 0}</b>小时</li>
+        <li>累计学习:<b>${Math.ceil(data.addUp==0?0:data.addUp/1000/60/60)}</b>小时</li>
         <li>今天计划学:<b>${data.todayTime}</b>小时</li>
-        <li>今天已学习:<b>${data.todayAddUp || 0}</b>小时</li>
-        <li>今天还需学:<b>${data.todayNeedTime || data.todayTime}</b>小时</li>
-        <li>距离学会还剩:<b>${data.sumNeedTime || data.skillTime}</b>小时</li>
+        <li>今天已学习:<b>${Math.ceil(data.todayAddUp==0?0:data.todayAddUp/1000/60/60)}</b>小时</li>
+        <li>今天还需学:<b>${Math.trunc(data.todayNeedTime<=0?0:data.todayNeedTime/1000/60/60)}</b>小时</li>
+        <li>距离学会还剩:<b>${Math.trunc(data.sumNeedTime<=0?0:data.sumNeedTime/1000/60/60)}</b>小时</li>
 </ul>
-<button id=${data.id} type="button" class="start-skill on"></button>`
+<button value=${data.id} type="button" class="start-skill on"></button>`
 }
 function fillForm(item) {
     for (const key in item) {
@@ -393,33 +401,43 @@ const reset = document.querySelector('#reset');
 let intervalId;
 let intervalId2;
 onOffDoc.addEventListener('click', (e) => {
+    console.log(e.target);
+    
     onOff(e.target);
 })
 reset.addEventListener('click', (e) => {
     //保存日志
-    logItem.endDateTime = Date.now();
-    logItem.duration = logItem.endDateTime - logItem.startDateTime;
-    updateDataToStore2(logItem);
+    // logItem.endDateTime = Date.now();
+    // logItem.duration = logItem.endDateTime - logItem.startDateTime;
+    // updateDataToStore2(logItem);
     //重置当前数据
-    currentPanel.h=0;
+    currentPanel.h = 0;
     currentPanel.todayAddUp = 0;
     currentPanel.todayNeedTime = currentPanel.todayTime;
-    currentPanel.h=0;
-    currentPanel.m=0;
-    currentPanel.s=0;
-    currentPanel.h2=0;
-    currentPanel.m2=0;
-    currentPanel.s2=0;
+    currentPanel.h = 0;
+    currentPanel.m = 0;
+    currentPanel.s = 0;
+    currentPanel.h2 = currentPanel.todayTime;
+    currentPanel.m2 = 0;
+    currentPanel.s2 = 0;
+    timeShows[1].textContent = `${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
+    timeShows[0].textContent = `${currentPanel.h > 9 ? currentPanel.h : '0' + currentPanel.h}:${currentPanel.m > 9 ? currentPanel.m : '0' + currentPanel.m}:${currentPanel.s > 9 ? currentPanel.s : '0' + currentPanel.s}`;
+
     updateDataToStore(currentPanel);
 })
 let logItem = {};
+function getNowTime(value) {
+    const date = new Date(value);
+    return `${date.getHours() > 9 ? date.getHours() : '0' + date.getHours()}:${date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()}:${date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()}`
+}
 function getNowDate(value) {
     const date = new Date(value);
-    return `${date.getFullYear()}-${date.getMonth() + 1 > 9 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)}-${date.getDate() > 9 ? date.getDate() : '0' + date.getDate()} 
-    ${date.getHours() > 9 ? date.getHours() : '0' + date.getHours()}:${date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()}:${date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()}`
+    return `${date.getFullYear()}-${date.getMonth() + 1 > 9 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)}-${date.getDate() > 9 ? date.getDate() : '0' + date.getDate()}`
 }
 
 function onOff(obj) {
+    console.log(obj.value );
+    
     if (obj.value === 'off') {
         obj.value = 'on';
         obj.className = 'on-off on'
@@ -445,67 +463,63 @@ function onOff(obj) {
 
 function run() {
     currentPanel.s++;
+    currentPanel.addUp = Number(currentPanel.addUp) + 1000;
+    currentPanel.todayAddUp = Number(currentPanel.todayAddUp) + 1000;
     if (currentPanel.s == 60) {
         currentPanel.s = 0;
         currentPanel.m++;
+        updateDataToStore(currentPanel);
+
     }
     if (currentPanel.m == 60) {
         currentPanel.m = 0;
         currentPanel.h++;
-        currentPanel.addUp++;
-        currentPanel.todayAddUp++;
     }
     timeShows[0].textContent = `${currentPanel.h > 9 ? currentPanel.h : '0' + currentPanel.h}:${currentPanel.m > 9 ? currentPanel.m : '0' + currentPanel.m}:${currentPanel.s > 9 ? currentPanel.s : '0' + currentPanel.s}`;
 
 }
 
+function run2() {
+    currentPanel.sumNeedTime = Number(currentPanel.sumNeedTime) - 1000;
+    currentPanel.todayNeedTime = Number(currentPanel.todayNeedTime) - 1000;
+    if (currentPanel.m2 == 0 && currentPanel.s2 == 0) {
+        currentPanel.m2 = 60;
+        currentPanel.h2--;
+    }
+    if (currentPanel.s2 == 0) {
+        currentPanel.s2 = 60;
+        currentPanel.m2--;
+    }
+    currentPanel.s2--;
+    // console.log(`${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`);
+    timeShows[1].textContent = `${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
+}
 const timerBtMode = document.querySelector('.timer-mode');
 timerBtMode.addEventListener('click', (e) => {
     if (e.target.textContent === '倒计时') {
         e.target.textContent = '正计时';
-        currentPanel.timerMode = 'I'
+        currentPanel.timerMode = '1'
         e.target.className = 'timer-mode increase'
         maskDivDocs[1].style.display = 'none';
         maskDivDocs[2].style.display = 'block';
     } else {
         e.target.textContent = '倒计时';
-        currentPanel.timerMode = 'R'
+        currentPanel.timerMode = '0'
         e.target.className = 'timer-mode reduce'
         maskDivDocs[2].style.display = 'none';
         maskDivDocs[1].style.display = 'block';
     }
 })
-function run2() {
-    if (currentPanel.m2 == 0 && currentPanel.s2 == 0) {
-        currentPanel.m2 = 60;
-        currentPanel.h2--;
-        currentPanel.sumNeedTime--;
-        currentPanel.todayNeedTime--;
-        updateDataToStore(currentPanel);
-
-    }
-    if (currentPanel.s2 == 0) {
-        currentPanel.s2 = 60;
-        currentPanel.m2--;
-        updateDataToStore(currentPanel);
-
-    }
-    currentPanel.s2--;
-    // console.log(`${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`);
-
-    timeShows[1].textContent = `${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
-
-}
-
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
+    console.log(e.code);
+
     if (e.code === 'Escape') {
         maskBtDoc.style.visibility = 'hidden';
         //看板更新
-        const div = document.getElementById(currentPanel.id);
-        fillPanel(div, currentPanel);
-        sectionDoc.prepend(div);
-
+        // const div = document.getElementById(currentPanel.id);
+        // fillPanel(div, currentPanel);
+        fillForm(currentPanel);
         clearInterval(intervalId);
         clearInterval(intervalId2);
         //数据库更新
@@ -520,19 +534,27 @@ maskBtDoc.addEventListener('keydown', (e) => {
 
 })
 const liTagDocs = document.querySelectorAll('.content li');
-console.log(liTagDocs);
 
 // 监听标签切换
 contentDoc.addEventListener('click', (e) => {
     switchTag(e.target.id)
 })
-// 监听日志页滚动条
-contentDivDoc[1].addEventListener('sorll', (e)=>{
-    
+
+let count = 1;
+loading.addEventListener('click', (e) => {
+    loading.textContent = '加载中......'
+    loading.disabled = true;
+    setTimeout(() => {
+        const today = new Date();
+        selectSkillLogList(today.valueOf() - (MILLISECOND * (count + 1))
+            , today.valueOf() - MILLISECOND * count);
+        count++;
+        loading.textContent = '点击加载历史数据'
+        loading.disabled = false;
+        loading.classList.toggle('display-none', false);
+    }, 500);
 })
 function switchTag(tagId) {
-    console.log(contentDivDoc);
-
     switch (tagId) {
         case 'log':
             contentDivDoc[1].classList.toggle('display-none', false);
