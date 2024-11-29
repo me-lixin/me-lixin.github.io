@@ -23,7 +23,7 @@ html {
 
 body {
     border-radius: 1rem;
-    min-width: 32rem;
+    min-width: 40rem;
     padding: 0.5rem;
     margin: 0.5rem;
     background: linear-gradient(to bottom,
@@ -37,11 +37,13 @@ body button:hover {
 }
 
 /* 隐藏类 */
-.display-none {}
+.display-none {
+    display: none;
+}
 
-.display-block {}
-
-.display-flex {}
+.background-tag {
+    background-color: #eee;
+}
 
 p,
 li,
@@ -52,11 +54,9 @@ label {
 }
 
 b {
-    color: #05586e;
-}
-
-strong {
     color: #a22a2a;
+    font-size: 1.7rem;
+
 }
 
 /* 页面两条分割线 */
@@ -121,6 +121,7 @@ header .logo-title {
 }
 
 header .ambition {
+    font-size: 2.3rem;
     text-align: center;
     display: inline-block;
     font-family: alimama, monospace;
@@ -129,9 +130,9 @@ header .ambition {
 
 
 header h1 {
-    font-size: 2.6rem;
+    font-size: 3rem;
     margin-top: 2.4rem;
-    font-family: alimama,monospace;
+    font-family: alimama, monospace;
 }
 
 /* 内容体样式 */
@@ -177,7 +178,7 @@ h2 {
 
 .start-skill {
     position: absolute;
-    bottom: 2rem;
+    bottom: 1rem;
     width: 5rem;
     height: 5rem;
     border-style: hidden;
@@ -196,18 +197,15 @@ aside {
     /* padding: 1rem; */
     flex: 2;
     /* background-color: red; */
+    min-width: 32rem;
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
     position: relative;
 }
 
-/* 浏览器视口宽度小于450px的时候隐藏的侧边栏,在需要的时候展示侧边栏内容 */
-@media screen and (max-width:450px) {
-    aside {
-        display: none;
-    }
-
+/* 浏览器视口宽度小于650px*/
+@media screen and (max-width:650px) {
     section {
         justify-content: space-around;
     }
@@ -280,11 +278,16 @@ aside ul li {
 }
 
 /* 侧边栏的功能页 */
+.log-info,
+.statistics,
+.instruction {
+    overflow: auto;
+    height: 59rem;
+}
+
 .log-info {
     /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
     padding: 1rem;
-    flex: 1;
-    overflow: auto;
     /* background-color: rgb(105, 210, 191); */
 }
 
@@ -296,11 +299,7 @@ aside ul li {
 
 .statistics {
     padding: 1rem;
-    overflow: auto;
-
     /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
-
-    flex: 1;
     /* background-color: rgb(140, 164, 216); */
     position: relative;
     text-align: center;
@@ -309,12 +308,7 @@ aside ul li {
 
 .instruction {
     padding: 2rem;
-    overflow: auto;
-
     /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
-
-    flex: 1;
-
     /* background-color: rgb(53, 160, 29); */
 
 }
@@ -324,8 +318,8 @@ aside ul li {
     /* box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2; */
 
     flex: 30;
-    width: 100%;
-    height: 100%;
+    /* width: 100%; */
+    /* height: 100%; */
     /* background-color: rgb(246, 232, 75); */
     padding: 1rem 3rem 3rem 3rem;
     overflow: auto;
@@ -346,7 +340,7 @@ label {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 100%;
+    /* width: 100%; */
 }
 
 .skill-form input {
@@ -418,6 +412,7 @@ label {
     margin-top: 2rem;
     background-color: white;
     border-radius: 5rem;
+    opacity: 0.7
 }
 
 .timer-mode {
@@ -436,7 +431,9 @@ label {
     /* background-color: aqua; */
     width: 100%;
 }
-
+.reset{
+    background: center / 100% 100% no-repeat url('../images/reset.svg'),white;
+}
 /* 页尾样式 */
 footer {
     height: 5rem;
