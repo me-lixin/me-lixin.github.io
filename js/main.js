@@ -210,7 +210,7 @@ function selectSkillLogToStatistics(offset) {
                     sum += item.duration;
                 }
             }
-            list[i].data = Math.floor(sum / 60 / 60 / 40);
+            list[i].data = Math.floor(sum /1000 / 60 / 60);
         }
         // 初次绘制
         initChart(offset == 1 ? 15 : 450);
@@ -230,8 +230,11 @@ function selectSkillLogList(startTime, endTime) {
         if (cursor) {
             let item = cursor.value
             const content = document.createElement('p');
-            let date = new Date(item.endDateTime - item.startDateTime);
-            content.innerHTML = `[${getNowTime(item.startDateTime)}] 学习<strong>[${item.skillName}]</strong> <b>${date.getHours() <= 8 ? date.getMinutes() : date.getHours() + '小时' + date.getMinutes()}</b>分钟`;
+            let hours = Math.trunc(item.duration/1000/60/60);
+            let minutes = Math.trunc(item.duration/1000/60%60);
+            content.innerHTML = `[${getNowTime(item.startDateTime)}]
+            学习<strong>[${item.skillName}]
+            </strong> <b>${hours}小时${minutes}</b>分钟`;
             //在loading标签前面插入
             loading.before(content);
             cursor.continue();
@@ -313,10 +316,10 @@ sectionDoc.addEventListener('click', (e) => {
         }
         onOff(onOffDoc);
     }
-    
-    fillForm(dataMap.get(divDoc.id))
-    contentShow('skill');
-
+    if(divDoc){
+        fillForm(dataMap.get(divDoc.id))
+        contentShow('skill');
+    }
 })
 function contentShow(type) {
     switch (type) {
