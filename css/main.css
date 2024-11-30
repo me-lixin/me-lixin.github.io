@@ -218,7 +218,7 @@ aside {
     }
 }
 
-aside ul li {
+.subnav ul li {
     padding: 0.5rem;
     list-style-type: none;
     display: inline;
@@ -254,12 +254,12 @@ aside ul li {
     height: 59rem;
 }
 
-.content li:hover {
+.subnav li:hover {
     cursor: pointer;
     border: solid 0.1rem #eee;
 }
 
-.content ul {
+.subnav ul {
     padding-left: 5rem;
 }
 
@@ -358,6 +358,12 @@ label {
     color: #325374;
     margin-top: 2rem;
     font-size: 1.4rem;
+}
+.author-said li{
+    color: #325374;
+    margin-top: 2rem;
+    font-size: 1.4rem;
+    text-align: start;
 }
 
 .submit {
