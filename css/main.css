@@ -305,6 +305,8 @@ aside {
     position: sticky;
     top: 0px;
     float: right;
+    font-size: 1.4rem;
+
 }
 
 .statistics {
