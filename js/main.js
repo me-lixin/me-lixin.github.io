@@ -149,7 +149,7 @@ function selectSkillLogToStatistics(offset) {
 
     let range;
     if (offset == 1) {
-        current = now.getDate()+1;
+        current = now.getDate() + 1;
         offsetTem = 30;
         let num = current - offsetTem;
         lastMax = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
@@ -247,15 +247,14 @@ function selectSkillLogList(startTime, endTime) {
 }
 
 function updateDataToStore2(data) {
-    if(data.duration < 60000){
-        return;
-    }
+    // if(data.duration < 60000){
+    //     return;
+    // }
     let store = createStore(DB_MODE, 'skillLog');
     data.dateTime = Date.now();
     store.put(data).onsuccess = (e) => {
         logPanel(data);
         console.log('log数据添加成功', e.target.result);
-        logItem = {};
     };
 }
 function logPanel(data) {
@@ -425,9 +424,6 @@ onOffDoc.addEventListener('click', (e) => {
 })
 reset.addEventListener('click', (e) => {
     //保存日志
-    // logItem.endDateTime = Date.now();
-    // logItem.duration = logItem.endDateTime - logItem.startDateTime;
-    // updateDataToStore2(logItem);
     //重置当前数据
     currentPanel.h = 0;
     currentPanel.todayAddUp = 0;
@@ -527,8 +523,6 @@ timerBtMode.addEventListener('click', (e) => {
 })
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
-    console.log(e.code);
-
     if (e.code === 'Escape') {
         //看板更新
         // const div = document.getElementById(currentPanel.id);
@@ -540,12 +534,17 @@ maskBtDoc.addEventListener('keydown', (e) => {
         clearInterval(intervalId2);
         //数据库更新
         updateDataToStore(currentPanel);
+
         //日志
-        logItem.endDateTime = Date.now();
-        logItem.duration = logItem.endDateTime - logItem.startDateTime;
-        updateDataToStore2(logItem);
-        onOffDoc.value = 'off';
-        onOff(onOffDoc)
+        if (onOffDoc.value === 'off') {
+            logItem.endDateTime = Date.now();
+            logItem.duration = logItem.endDateTime - logItem.startDateTime;
+            updateDataToStore2(logItem);
+            onOff(onOffDoc)
+        }
+
+
+
     } else if (e.code === 'Space') {
         onOff(onOffDoc);
     }
@@ -566,12 +565,15 @@ maskBtDoc.addEventListener('touchend', () => {
         clearInterval(intervalId2);
         //数据库更新
         updateDataToStore(currentPanel);
+
         //日志
-        logItem.endDateTime = Date.now();
-        logItem.duration = logItem.endDateTime - logItem.startDateTime;
-        updateDataToStore2(logItem);
-        onOffDoc.value = 'off';
-        onOff(onOffDoc)
+        if (onOffDoc.value === 'off') {
+            logItem.endDateTime = Date.now();
+            logItem.duration = logItem.endDateTime - logItem.startDateTime;
+            updateDataToStore2(logItem);
+            onOff(onOffDoc)
+        }
+
     }
 });
 
