@@ -289,7 +289,7 @@ aside {
     height: 59rem;
     /* background-color: rgb(105, 210, 191); */
 }
-.log-info button{
+#loading{
     background-color: transparent;
     font-size: 1.4rem;
     margin-top: 2rem;
@@ -300,6 +300,11 @@ aside {
     font-size: 1.2rem;
     letter-spacing: 0.1rem;
     line-height: 2.5rem;
+}
+.download{
+    position: sticky;
+    top: 0px;
+    float: right;
 }
 
 .statistics {
@@ -430,7 +435,7 @@ label {
     border-style: hidden;
     padding: 1.5rem 0 1.5rem 3.5rem;
     width: 14rem;
-    margin-top: 2rem;
+    margin-top: 7rem;
     background-color: white;
     opacity: 0.5;
 }
