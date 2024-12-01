@@ -3,9 +3,12 @@ let intervalId4;
 let time;
 function run3() {
     time.s++;
+    time.addUp = Number(time.addUp) + 1000;
+    time.todayAddUp = Number(time.todayAddUp) + 1000;
     if (time.s == 60) {
         time.s = 0;
         time.m++;
+        updateDataToStoreWorker(time);
     }
     if (time.m == 60) {
         time.m = 0;
@@ -15,15 +18,13 @@ function run3() {
     }
 }
 function run4() {
+    time.sumNeedTime = Number(time.sumNeedTime) - 1000;
+    time.todayNeedTime = Number(time.todayNeedTime) - 1000;
     if (time.m2 == 0 && time.s2 == 0) {
-        updateDataToStoreWorker(time);
         time.m2 = 60;
         time.h2--;
-        time.sumNeedTime--;
-        time.todayNeedTime--;
     }
     if (time.s2 == 0) {
-        updateDataToStoreWorker(time);
         time.s2 = 60;
         time.m2--;
     }
