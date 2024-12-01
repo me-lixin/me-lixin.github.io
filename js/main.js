@@ -74,6 +74,8 @@ formDoc.addEventListener('submit', (e) => {
 //默认数据填充
 function defaultDataFill(data) {
     data.dateTime = Date.now();
+    data.addUp = data.addUp || 0;
+    data.todayAddUp = data.todayAddUp || 0;
     data.todayNeedTime = Number(data.todayTime) * 1000 * 60 * 60 - Number(data.todayAddUp);
     data.sumNeedTime = Number(data.skillTime) * 1000 * 60 * 60 - Number(data.addUp);
     data.h = data.h || 0;
@@ -84,8 +86,7 @@ function defaultDataFill(data) {
     data.m2 = data.m2 || 0;
     data.s2 = data.s2 || 0;
     data.timerMode = data.timerMode || '0';
-    data.addUp = data.addUp || 0;
-    data.todayAddUp = data.todayAddUp || 0;
+
 }
 function initalizeDB() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -95,7 +96,9 @@ function initalizeDB() {
         selectDataFromStore();
         selectSkillLogToStatistics(1);
         switchTag('log');
-        selectSkillLogList(Date.now() - MILLISECOND, Date.now());
+        const now = new Date();
+        selectSkillLogList(new Date(now.getFullYear(), now.getMonth(), now.getDate()).valueOf()
+            , Date.now());
     }
     request.onerror = (e) => {
         alert("请允许我的 web 应用使用 IndexedDB！");
@@ -134,6 +137,17 @@ function updateDataToStore(data) {
         console.log('数据更新成功', e.target.result);
         dataToElement(data);
     };
+}
+function deleteSkill(dataId) {
+    let store = createStore(DB_MODE, DB_STORE_NAME)
+    return new Promise((resolve) => {
+        store.delete(dataId).onsuccess = (e) => {
+            console.log('数据删除成功', e.target);
+            resolve(e.target.result)
+        };
+    })
+
+
 }
 function selectSkillLogToStatistics(offset) {
     list = [];
@@ -218,6 +232,13 @@ function selectSkillLogList(startTime, endTime) {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
     const range = IDBKeyRange.bound(startTime, endTime);
+    if (startTime == 0) {
+        return new Promise((resolve) => {
+            index.getAll().onsuccess = (e) => {
+                resolve(e.target.result);
+            }
+        })
+    }
     //index.openCursor(range, 'prev')降序查询
     const title = document.createElement('p');
     title.innerHTML = `<strong>${getNowDate(endTime)}</strong>`;
@@ -237,19 +258,12 @@ function selectSkillLogList(startTime, endTime) {
             cursor.continue();
         }
     }
-    if (startTime == 0) {
-        return new Promise((resolve) => {
-            index.getAll().onsuccess = (e) => {
-                resolve(e.target.result);
-            }
-        })
-    }
 }
 
 function updateDataToStore2(data) {
-    // if(data.duration < 60000){
-    //     return;
-    // }
+    if (data.duration < 60000) {
+        return;
+    }
     let store = createStore(DB_MODE, 'skillLog');
     data.dateTime = Date.now();
     store.put(data).onsuccess = (e) => {
@@ -295,7 +309,7 @@ function constructorPanel(data) {
     sectionDoc.prepend(div);
 }
 
-sectionDoc.addEventListener('click', (e) => {
+sectionDoc.addEventListener('click', async (e) => {
     let divDoc;
     if (e.target.id) {
         divDoc = e.target;
@@ -309,7 +323,7 @@ sectionDoc.addEventListener('click', (e) => {
     if (e.target.parentNode.parentNode.parentNode.id) {
         divDoc = e.target.parentNode.parentNode.parentNode;
     }
-    if (e.target.type === 'button') {
+    if (e.target.className === 'start-skill on') {
         maskBtDoc.style.visibility = 'visible';
         maskBtDoc.focus();
         currentPanel = dataMap.get(divDoc.id)
@@ -330,6 +344,12 @@ sectionDoc.addEventListener('click', (e) => {
         }
         onOff(onOffDoc);
         return;
+    }
+    if (e.target.className === 'delete-skill') {
+        console.log(divDoc.id);
+        let deleteID = await deleteSkill(divDoc.id);
+        console.log('deleteID', deleteID);
+        divDoc.parentNode.removeChild(divDoc);
     }
     if (divDoc) {
         fillForm(dataMap.get(divDoc.id))
@@ -380,7 +400,9 @@ function fillPanel(div, data) {
         <li>今天还需学:<b>${Math.trunc(data.todayNeedTime <= 0 ? 0 : data.todayNeedTime / 1000 / 60 / 60)}</b>小时</li>
         <li>距离学会还剩:<b>${Math.trunc(data.sumNeedTime <= 0 ? 0 : data.sumNeedTime / 1000 / 60 / 60)}</b>小时</li>
 </ul>
+<button type="button" class="delete-skill"></button>
 <button value=${data.id} type="button" class="start-skill on"></button>`
+
 }
 function fillForm(item) {
     for (const key in item) {
@@ -523,12 +545,13 @@ timerBtMode.addEventListener('click', (e) => {
 })
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
+    // console.log(e.code);
+
     if (e.code === 'Escape') {
         //看板更新
         // const div = document.getElementById(currentPanel.id);
         // fillPanel(div, currentPanel);
         maskBtDoc.style.visibility = 'hidden';
-
         fillForm(currentPanel);
         clearInterval(intervalId);
         clearInterval(intervalId2);
@@ -539,16 +562,13 @@ maskBtDoc.addEventListener('keydown', (e) => {
         if (onOffDoc.value === 'off') {
             logItem.endDateTime = Date.now();
             logItem.duration = logItem.endDateTime - logItem.startDateTime;
-            updateDataToStore2(logItem);
             onOff(onOffDoc)
         }
-
-
-
     } else if (e.code === 'Space') {
         onOff(onOffDoc);
     }
 })
+
 let touchStart;
 maskBtDoc.addEventListener('touchstart', () => {
     touchStart = Date.now();
@@ -570,7 +590,6 @@ maskBtDoc.addEventListener('touchend', () => {
         if (onOffDoc.value === 'off') {
             logItem.endDateTime = Date.now();
             logItem.duration = logItem.endDateTime - logItem.startDateTime;
-            updateDataToStore2(logItem);
             onOff(onOffDoc)
         }
 
@@ -584,31 +603,32 @@ contentDoc.addEventListener('click', (e) => {
     switchTag(e.target.id)
 })
 //加载更多日志
-let count = 1;
+let count = 0;
 loading.addEventListener('click', (e) => {
     loading.textContent = '加载中......'
     loading.disabled = true;
     setTimeout(() => {
-        const today = new Date();
-        selectSkillLogList(today.valueOf() - (MILLISECOND * (count + 1))
-            , today.valueOf() - MILLISECOND * count);
+        const now = new Date();
+        // selectSkillLogList(today.valueOf() - (MILLISECOND * (count + 1))
+        //     , today.valueOf() - MILLISECOND * count);
+        selectSkillLogList(new Date(now.getFullYear(), now.getMonth(), now.getDate() - (count + 1)).valueOf()
+            , new Date(now.getFullYear(), now.getMonth(), now.getDate() - count).valueOf() - 1);
         count++;
         loading.textContent = '点击加载历史数据'
         loading.disabled = false;
         loading.classList.toggle('display-none', false);
     }, 500);
 })
-
 // 下载日志
 const download = document.querySelector('.download');
 download.addEventListener('click', async (e) => {
     const logList = await selectSkillLogList(0, Date.now())
-    let logStr;
+    let logStr = '';
     for (const item of logList) {
         const content = document.createElement('p');
         let hours = Math.trunc(item.duration / 1000 / 60 / 60);
         let minutes = Math.trunc(item.duration / 1000 / 60 % 60);
-        logStr += `<br>[${getNowTime(item.startDateTime)}]
+        logStr += `<br>[${getNowDate(item.startDateTime)} ${getNowTime(item.startDateTime)}]
         学习<strong>[${item.skillName}]
         </strong> <b>${hours}</b>小时<b>${minutes}</b>分钟`;
     }
