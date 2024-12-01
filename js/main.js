@@ -29,7 +29,7 @@ formDoc.addEventListener('reset', () => {
     durationDoc[0].textContent = '600';
     durationDoc[1].textContent = '9';
     for (const item of formDoc) {
-        if (item.type==='hidden') {
+        if (item.type === 'hidden') {
             item.value = 0;
         }
     }
@@ -40,7 +40,7 @@ contentShow();
 // 添加技能按钮
 addSkillDoc.addEventListener('click', () => {
     let hiddenNode = document.querySelector('#id')
-    if(hiddenNode){
+    if (hiddenNode) {
         hiddenNode.parentNode.removeChild(hiddenNode);
     }
     formDoc.reset();
@@ -71,19 +71,16 @@ formDoc.addEventListener('submit', (e) => {
     }
     updateDataToStore(Object.fromEntries(formData))
 })
-let q='9'
-console.log(Number(q)+1);
-
 //默认数据填充
 function defaultDataFill(data) {
     data.dateTime = Date.now();
-    data.todayNeedTime = Number(data.todayTime)*1000*60*60  - Number(data.todayAddUp);
-    data.sumNeedTime = Number(data.skillTime)*1000*60*60 - Number(data.addUp);
+    data.todayNeedTime = Number(data.todayTime) * 1000 * 60 * 60 - Number(data.todayAddUp);
+    data.sumNeedTime = Number(data.skillTime) * 1000 * 60 * 60 - Number(data.addUp);
     data.h = data.h || 0;
     data.m = data.m || 0;
     data.sm = data.sm || 0;
     data.s = data.s || 0;
-    data.h2 = Math.trunc((Number(data.todayTime)*1000*60*60 - Number(data.todayAddUp))/1000/60/60); 
+    data.h2 = Math.trunc((Number(data.todayTime) * 1000 * 60 * 60 - Number(data.todayAddUp)) / 1000 / 60 / 60);
     data.m2 = data.m2 || 0;
     data.s2 = data.s2 || 0;
     data.timerMode = data.timerMode || '0';
@@ -152,7 +149,7 @@ function selectSkillLogToStatistics(offset) {
 
     let range;
     if (offset == 1) {
-        current = now.getDate();
+        current = now.getDate()+1;
         offsetTem = 30;
         let num = current - offsetTem;
         lastMax = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
@@ -210,7 +207,7 @@ function selectSkillLogToStatistics(offset) {
                     sum += item.duration;
                 }
             }
-            list[i].data = Math.floor(sum /1000 / 60 / 60);
+            list[i].data = Math.floor(sum / 1000 / 60 / 60);
         }
         // 初次绘制
         initChart(offset == 1 ? 15 : 450);
@@ -230,28 +227,46 @@ function selectSkillLogList(startTime, endTime) {
         if (cursor) {
             let item = cursor.value
             const content = document.createElement('p');
-            let hours = Math.trunc(item.duration/1000/60/60);
-            let minutes = Math.trunc(item.duration/1000/60%60);
+            let hours = Math.trunc(item.duration / 1000 / 60 / 60);
+            let minutes = Math.trunc(item.duration / 1000 / 60 % 60);
             content.innerHTML = `[${getNowTime(item.startDateTime)}]
             学习<strong>[${item.skillName}]
-            </strong> <b>${hours}小时${minutes}</b>分钟`;
+            </strong> <b>${hours}</b>小时<b>${minutes}</b>分钟`;
             //在loading标签前面插入
             loading.before(content);
             cursor.continue();
         }
     }
+    if (startTime == 0) {
+        return new Promise((resolve) => {
+            index.getAll().onsuccess = (e) => {
+                resolve(e.target.result);
+            }
+        })
+    }
 }
 
 function updateDataToStore2(data) {
+    if(data.duration < 60000){
+        return;
+    }
     let store = createStore(DB_MODE, 'skillLog');
     data.dateTime = Date.now();
     store.put(data).onsuccess = (e) => {
+        logPanel(data);
         console.log('log数据添加成功', e.target.result);
+        logItem = {};
     };
 }
 function logPanel(data) {
-
-
+    const firstLog = logInfoDoc.firstElementChild;
+    const content = document.createElement('p');
+    let hours = Math.trunc(data.duration / 1000 / 60 / 60);
+    let minutes = Math.trunc(data.duration / 1000 / 60 % 60);
+    content.innerHTML = `[${getNowTime(data.startDateTime)}]
+    学习<strong>[${data.skillName}]
+    </strong> <b>${hours}</b>小时<b>${minutes}</b>分钟`;
+    firstLog.after(content);
 }
 function dataToElement(item) {
     dataMap.set(item.id, item);
@@ -283,16 +298,16 @@ function constructorPanel(data) {
 
 sectionDoc.addEventListener('click', (e) => {
     let divDoc;
-    if(e.target.id){
+    if (e.target.id) {
         divDoc = e.target;
     }
-    if(e.target.parentNode.id){
+    if (e.target.parentNode.id) {
         divDoc = e.target.parentNode;
     }
-    if(e.target.parentNode.parentNode.id){
+    if (e.target.parentNode.parentNode.id) {
         divDoc = e.target.parentNode.parentNode;
     }
-    if(e.target.parentNode.parentNode.parentNode.id){
+    if (e.target.parentNode.parentNode.parentNode.id) {
         divDoc = e.target.parentNode.parentNode.parentNode;
     }
     if (e.target.type === 'button') {
@@ -306,17 +321,18 @@ sectionDoc.addEventListener('click', (e) => {
         if (currentPanel.timerMode === '0') {
             timerBtMode.textContent = '倒计时';
             timerBtMode.className = 'timer-mode reduce'
-            maskDivDocs[1].classList.toggle('display-none',false);
-            maskDivDocs[2].classList.toggle('display-none',true);
+            maskDivDocs[1].classList.toggle('display-none', false);
+            maskDivDocs[2].classList.toggle('display-none', true);
         } else {
             timerBtMode.textContent = '正计时';
             timerBtMode.className = 'timer-mode increase'
-            maskDivDocs[1].classList.toggle('display-none',true);
-            maskDivDocs[2].classList.toggle('display-none',false);
+            maskDivDocs[1].classList.toggle('display-none', true);
+            maskDivDocs[2].classList.toggle('display-none', false);
         }
         onOff(onOffDoc);
+        return;
     }
-    if(divDoc){
+    if (divDoc) {
         fillForm(dataMap.get(divDoc.id))
         contentShow('skill');
     }
@@ -359,11 +375,11 @@ function fillPanel(div, data) {
     <h2>${data.skillName}</h2>
     <p>你要用<b>${data.skillTime}</b>个小时来学<strong>[${data.skillName}]</strong>,要是学不会,你将<b>[生不如死]</b>!</p>
     <ul>
-        <li>累计学习:<b>${Math.ceil(data.addUp==0?0:data.addUp/1000/60/60)}</b>小时</li>
+        <li>累计学习:<b>${Math.ceil(data.addUp == 0 ? 0 : data.addUp / 1000 / 60 / 60)}</b>小时</li>
         <li>今天计划学:<b>${data.todayTime}</b>小时</li>
-        <li>今天已学习:<b>${Math.ceil(data.todayAddUp==0?0:data.todayAddUp/1000/60/60)}</b>小时</li>
-        <li>今天还需学:<b>${Math.trunc(data.todayNeedTime<=0?0:data.todayNeedTime/1000/60/60)}</b>小时</li>
-        <li>距离学会还剩:<b>${Math.trunc(data.sumNeedTime<=0?0:data.sumNeedTime/1000/60/60)}</b>小时</li>
+        <li>今天已学习:<b>${Math.ceil(data.todayAddUp == 0 ? 0 : data.todayAddUp / 1000 / 60 / 60)}</b>小时</li>
+        <li>今天还需学:<b>${Math.trunc(data.todayNeedTime <= 0 ? 0 : data.todayNeedTime / 1000 / 60 / 60)}</b>小时</li>
+        <li>距离学会还剩:<b>${Math.trunc(data.sumNeedTime <= 0 ? 0 : data.sumNeedTime / 1000 / 60 / 60)}</b>小时</li>
 </ul>
 <button value=${data.id} type="button" class="start-skill on"></button>`
 }
@@ -403,9 +419,8 @@ const reset = document.querySelector('#reset');
 
 let intervalId;
 let intervalId2;
+//暂停开始
 onOffDoc.addEventListener('click', (e) => {
-    console.log(e.target);
-    
     onOff(e.target);
 })
 reset.addEventListener('click', (e) => {
@@ -439,8 +454,6 @@ function getNowDate(value) {
 }
 
 function onOff(obj) {
-    console.log(obj.value );
-    
     if (obj.value === 'off') {
         obj.value = 'on';
         obj.className = 'on-off on'
@@ -472,7 +485,6 @@ function run() {
         currentPanel.s = 0;
         currentPanel.m++;
         updateDataToStore(currentPanel);
-
     }
     if (currentPanel.m == 60) {
         currentPanel.m = 0;
@@ -518,10 +530,11 @@ maskBtDoc.addEventListener('keydown', (e) => {
     console.log(e.code);
 
     if (e.code === 'Escape') {
-        maskBtDoc.style.visibility = 'hidden';
         //看板更新
         // const div = document.getElementById(currentPanel.id);
         // fillPanel(div, currentPanel);
+        maskBtDoc.style.visibility = 'hidden';
+
         fillForm(currentPanel);
         clearInterval(intervalId);
         clearInterval(intervalId2);
@@ -531,18 +544,44 @@ maskBtDoc.addEventListener('keydown', (e) => {
         logItem.endDateTime = Date.now();
         logItem.duration = logItem.endDateTime - logItem.startDateTime;
         updateDataToStore2(logItem);
+        onOffDoc.value = 'off';
+        onOff(onOffDoc)
     } else if (e.code === 'Space') {
         onOff(onOffDoc);
     }
-
 })
+let touchStart;
+maskBtDoc.addEventListener('touchstart', () => {
+    touchStart = Date.now();
+    console.log('触摸开始');
+});
+maskBtDoc.addEventListener('touchend', () => {
+    console.log('触摸结束');
+    if (touchStart && 1000 < Date.now() - touchStart) {
+        //看板更新
+        maskBtDoc.style.visibility = 'hidden';
+
+        fillForm(currentPanel);
+        clearInterval(intervalId);
+        clearInterval(intervalId2);
+        //数据库更新
+        updateDataToStore(currentPanel);
+        //日志
+        logItem.endDateTime = Date.now();
+        logItem.duration = logItem.endDateTime - logItem.startDateTime;
+        updateDataToStore2(logItem);
+        onOffDoc.value = 'off';
+        onOff(onOffDoc)
+    }
+});
+
 const liTagDocs = document.querySelectorAll('.content li');
 
 // 监听标签切换
 contentDoc.addEventListener('click', (e) => {
     switchTag(e.target.id)
 })
-
+//加载更多日志
 let count = 1;
 loading.addEventListener('click', (e) => {
     loading.textContent = '加载中......'
@@ -557,6 +596,27 @@ loading.addEventListener('click', (e) => {
         loading.classList.toggle('display-none', false);
     }, 500);
 })
+
+// 下载日志
+const download = document.querySelector('.download');
+download.addEventListener('click', async (e) => {
+    const logList = await selectSkillLogList(0, Date.now())
+    let logStr;
+    for (const item of logList) {
+        const content = document.createElement('p');
+        let hours = Math.trunc(item.duration / 1000 / 60 / 60);
+        let minutes = Math.trunc(item.duration / 1000 / 60 % 60);
+        logStr += `<br>[${getNowTime(item.startDateTime)}]
+        学习<strong>[${item.skillName}]
+        </strong> <b>${hours}</b>小时<b>${minutes}</b>分钟`;
+    }
+    const blob = new Blob([logStr], { type: "text/html" });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = '日志.html';
+    link.click();
+
+});
 function switchTag(tagId) {
     switch (tagId) {
         case 'log':
@@ -608,11 +668,13 @@ window.addEventListener('unload', () => {
 // 后台运行逻辑
 const worke = new Worker('js/timer.js')
 document.addEventListener('visibilitychange', () => {
-    if (document.hidden && maskBtDoc.style.visibility === 'visible') {
+    console.log('onOffDoc.value', onOffDoc.value);
+
+    if (document.hidden && onOffDoc.value === 'off') {
         console.log('页面隐藏，降低任务频率');
         worke.postMessage(['start', currentPanel])
         // 调整任务逻辑
-    } else if (!document.hidden && maskBtDoc.style.visibility === 'visible') {
+    } else if (!document.hidden && onOffDoc.value === 'off') {
         worke.postMessage(['end'])
         worke.onmessage = (e) => {
             currentPanel = e.data;
