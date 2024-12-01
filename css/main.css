@@ -302,11 +302,10 @@ aside {
     line-height: 2.5rem;
 }
 .download{
-    position: sticky;
-    top: 0px;
-    float: right;
+    position: absolute;
+    top: 6rem;
+    right: 2rem;
     font-size: 1.4rem;
-
 }
 
 .statistics {
