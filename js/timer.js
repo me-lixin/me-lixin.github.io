@@ -53,7 +53,7 @@ onmessage = (e) => {
 
 const DB_STORE_NAME_WK = 'skill';
 const DB_NAME_WK = 'skillManage';
-const DB_VERSION_WK = 4;
+const DB_VERSION_WK = 8;
 
 async function updateDataToStoreWorker(data) {
     let store = await createStoreWorker('readwrite')
