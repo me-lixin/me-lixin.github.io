@@ -14,7 +14,7 @@ const formDoc = document.getElementById('skillForm')
 
 //indexDB常量
 const DB_NAME = 'skillManage';
-const DB_VERSION = 4;
+const DB_VERSION = 8;
 const DB_STORE_NAME = 'skill';
 const DB_MODE = 'readwrite';
 const MILLISECOND = 86400000;
@@ -231,7 +231,6 @@ function selectSkillLogToStatistics(offset) {
 function selectSkillLogList(startTime, endTime) {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
-    const range = IDBKeyRange.bound(startTime, endTime);
     if (startTime == 0) {
         return new Promise((resolve) => {
             index.getAll().onsuccess = (e) => {
@@ -239,6 +238,7 @@ function selectSkillLogList(startTime, endTime) {
             }
         })
     }
+    const range = IDBKeyRange.bound(startTime, endTime);
     //index.openCursor(range, 'prev')降序查询
     const title = document.createElement('p');
     title.innerHTML = `<strong>${getNowDate(endTime)}</strong>`;
@@ -265,7 +265,7 @@ function updateDataToStore2(data) {
         return;
     }
     let store = createStore(DB_MODE, 'skillLog');
-    data.dateTime = Date.now();
+    data.dateTime = data.startDateTime;
     store.put(data).onsuccess = (e) => {
         logPanel(data);
         console.log('log数据添加成功', e.target.result);
@@ -529,23 +529,26 @@ function run2() {
 }
 const timerBtMode = document.querySelector('.timer-mode');
 timerBtMode.addEventListener('click', (e) => {
-    if (e.target.textContent === '倒计时') {
-        e.target.textContent = '正计时';
+    timerModeSwitch(e.target);
+})
+function timerModeSwitch(modeDiv) {
+    if (modeDiv.textContent === '倒计时') {
+        modeDiv.textContent = '正计时';
         currentPanel.timerMode = '1'
-        e.target.className = 'timer-mode increase'
+        modeDiv.className = 'timer-mode increase'
         maskDivDocs[1].style.display = 'none';
         maskDivDocs[2].style.display = 'block';
     } else {
-        e.target.textContent = '倒计时';
+        modeDiv.textContent = '倒计时';
         currentPanel.timerMode = '0'
-        e.target.className = 'timer-mode reduce'
+        modeDiv.className = 'timer-mode reduce'
         maskDivDocs[2].style.display = 'none';
         maskDivDocs[1].style.display = 'block';
     }
-})
+}
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
-    // console.log(e.code);
+    console.log(e.code);
 
     if (e.code === 'Escape') {
         //看板更新
@@ -566,6 +569,8 @@ maskBtDoc.addEventListener('keydown', (e) => {
         }
     } else if (e.code === 'Space') {
         onOff(onOffDoc);
+    } else if (e.code === 'Tab') {
+        timerModeSwitch(timerBtMode)
     }
 })
 
@@ -688,22 +693,40 @@ window.addEventListener('unload', () => {
 })
 
 // 后台运行逻辑
-const worke = new Worker('js/timer.js')
+// const worke = new Worker('js/timer.js')
+let timeStamp;
 document.addEventListener('visibilitychange', () => {
     console.log('onOffDoc.value', onOffDoc.value);
 
     if (document.hidden && onOffDoc.value === 'off') {
         console.log('页面隐藏，降低任务频率');
-        worke.postMessage(['start', currentPanel])
+        timeStamp = Date.now();
+        clearInterval(intervalId);
+        clearInterval(intervalId2);
+        // worke.postMessage(['start', currentPanel])
         // 调整任务逻辑
     } else if (!document.hidden && onOffDoc.value === 'off') {
-        worke.postMessage(['end'])
-        worke.onmessage = (e) => {
-            currentPanel = e.data;
-            console.log('时间我的执行时间呢', e.data);
-        }
+        // worke.postMessage(['end'])
+        // worke.onmessage = (e) => {
+        //     currentPanel = e.data;
+        //     console.log('时间我的执行时间呢', e.data);
+        // }
         console.log('页面激活，恢复任务频率');
+
         // 恢复任务逻辑
+        let timeDifference = Date.now() - timeStamp;
+        let h = Math.trunc(timeDifference / 1000 / 60 / 60);
+        let m = Math.trunc(timeDifference / 1000 / 60 % 60);
+        let s = Math.ceil(timeDifference / 1000 % 3600);
+        currentPanel.h += h;
+        currentPanel.m += m;
+        currentPanel.s += s;
+        currentPanel.h2 += -h;
+        currentPanel.m2 += -m;
+        currentPanel.s2 += -s;
+        intervalId = setInterval(run, 1000);
+        intervalId2 = setInterval(run2, 1000);
+
     }
 });
 
@@ -713,7 +736,6 @@ const offscreenCanvas = new OffscreenCanvas(300, 260);
 const offCtx = offscreenCanvas.getContext('2d');
 const canvas = document.getElementById('lineChart');
 const ctx = canvas.getContext('2d');
-
 // 绘制坐标系和刻度
 function drawGrid(maxData) {
     const padding = 30;
