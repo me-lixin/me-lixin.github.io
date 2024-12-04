@@ -350,6 +350,8 @@ sectionDoc.addEventListener('click', async (e) => {
         let deleteID = await deleteSkill(divDoc.id);
         console.log('deleteID', deleteID);
         divDoc.parentNode.removeChild(divDoc);
+        formDoc.reset();
+        return;
     }
     if (divDoc) {
         fillForm(dataMap.get(divDoc.id))
@@ -525,7 +527,7 @@ function run2() {
     }
     currentPanel.s2--;
     // console.log(`${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`);
-    timeShows[1].textContent = `${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
+    timeShows[1].textContent = `${(currentPanel.h2 > 9 || currentPanel.h2 < 0) ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
 }
 const timerBtMode = document.querySelector('.timer-mode');
 timerBtMode.addEventListener('click', (e) => {
@@ -712,23 +714,49 @@ document.addEventListener('visibilitychange', () => {
         //     console.log('时间我的执行时间呢', e.data);
         // }
         console.log('页面激活，恢复任务频率');
-
+        restorationTiem();
         // 恢复任务逻辑
-        let timeDifference = Date.now() - timeStamp;
-        let h = Math.trunc(timeDifference / 1000 / 60 / 60);
-        let m = Math.trunc(timeDifference / 1000 / 60 % 60);
-        let s = Math.ceil(timeDifference / 1000 % 3600);
-        currentPanel.h += h;
-        currentPanel.m += m;
-        currentPanel.s += s;
-        currentPanel.h2 += -h;
-        currentPanel.m2 += -m;
-        currentPanel.s2 += -s;
-        intervalId = setInterval(run, 1000);
-        intervalId2 = setInterval(run2, 1000);
+        // let timeDifference = MILLISECOND-1000 ;
 
     }
 });
+function restorationTiem(){
+    let timeDifference = Date.now() - timeStamp;
+    let h = Math.trunc(timeDifference / 1000 / 60 / 60);
+    let m = Math.trunc(timeDifference/ 1000 / 60 % 60);
+    let s = Math.trunc(timeDifference / 1000 % 60);
+    Number(currentPanel.h) += h;
+    Number(currentPanel.m) += m;
+    Number(currentPanel.s) += s;
+    if (Number(currentPanel.m) >= 60) {
+        Number(currentPanel.h)++;
+        Number(currentPanel.m)-=60;
+    }
+    if (Number(currentPanel.s) >= 60) {
+        Number(currentPanel.m)++;
+        Number(currentPanel.s)-=60;
+    }
+    Number(currentPanel.h2) -= h;
+    Number(currentPanel.m2) -= m;
+    Number(currentPanel.s2) -= s;
+    if (Number(currentPanel.m2) <= 0) {
+        Number(currentPanel.h2)--;
+        Number(currentPanel.m2)+=60;
+    }
+    if (Number(currentPanel.s2) <= 0) {
+        Number(currentPanel.m2)--;
+        Number(currentPanel.s2)+=60;
+    }
+    run();
+    run2();
+    currentPanel.sumNeedTime = currentPanel.sumNeedTime - timeDifference;
+    currentPanel.todayNeedTime = currentPanel.todayNeedTime - timeDifference;
+    currentPanel.addUp = currentPanel.addUp + timeDifference;
+    currentPanel.todayAddUp = currentPanel.todayAddUp + timeDifference;
+
+    intervalId = setInterval(run, 1000);
+    intervalId2 = setInterval(run2, 1000);
+}
 
 // 统计图
 const tooltip = document.querySelector('.tooltip');
