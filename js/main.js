@@ -714,38 +714,39 @@ document.addEventListener('visibilitychange', () => {
         //     console.log('时间我的执行时间呢', e.data);
         // }
         console.log('页面激活，恢复任务频率');
-        restorationTiem();
         // 恢复任务逻辑
-        // let timeDifference = MILLISECOND-1000 ;
+        restorationTiem();
 
     }
 });
-function restorationTiem(){
+function restorationTiem() {
     let timeDifference = Date.now() - timeStamp;
+    // let timeDifference = MILLISECOND/24 ;
+
     let h = Math.trunc(timeDifference / 1000 / 60 / 60);
-    let m = Math.trunc(timeDifference/ 1000 / 60 % 60);
+    let m = Math.trunc(timeDifference / 1000 / 60 % 60);
     let s = Math.trunc(timeDifference / 1000 % 60);
-    Number(currentPanel.h) += h;
-    Number(currentPanel.m) += m;
-    Number(currentPanel.s) += s;
-    if (Number(currentPanel.m) >= 60) {
-        Number(currentPanel.h)++;
-        Number(currentPanel.m)-=60;
+    currentPanel.h = Number(currentPanel.h) + h;
+    currentPanel.m = Number(currentPanel.m) + m;
+    currentPanel.s = Number(currentPanel.s) + s;
+    if (currentPanel.m >= 60) {
+        currentPanel.h++;
+        currentPanel.m -= 60;
     }
-    if (Number(currentPanel.s) >= 60) {
-        Number(currentPanel.m)++;
-        Number(currentPanel.s)-=60;
+    if (currentPanel.s >= 60) {
+        currentPanel.m++;
+        currentPanel.s -= 60;
     }
-    Number(currentPanel.h2) -= h;
-    Number(currentPanel.m2) -= m;
-    Number(currentPanel.s2) -= s;
-    if (Number(currentPanel.m2) <= 0) {
-        Number(currentPanel.h2)--;
-        Number(currentPanel.m2)+=60;
+    currentPanel.h2 = Number(currentPanel.h2) - h;
+    currentPanel.m2 = Number(currentPanel.m2) - m;
+    currentPanel.s2 = Number(currentPanel.s2) - s;
+    if (currentPanel.m2 <= 0) {
+        currentPanel.h2--;
+        currentPanel.m2 += 60;
     }
-    if (Number(currentPanel.s2) <= 0) {
-        Number(currentPanel.m2)--;
-        Number(currentPanel.s2)+=60;
+    if (currentPanel.s2 <= 0) {
+        currentPanel.m2--;
+        currentPanel.s2 += 60;
     }
     run();
     run2();
