@@ -450,9 +450,11 @@ let intervalId;
 let intervalId2;
 //暂停开始
 onOffDoc.addEventListener('click', (e) => {
+    e.stopPropagation()
     onOff(e.target);
 })
 reset.addEventListener('click', (e) => {
+    e.stopPropagation()
     //保存日志
     //重置当前数据
     currentPanel.h = 0;
@@ -537,6 +539,7 @@ function run2() {
 }
 const timerBtMode = document.querySelector('.timer-mode');
 timerBtMode.addEventListener('click', (e) => {
+    e.stopPropagation()
     timerModeSwitch(e.target);
 })
 function timerModeSwitch(modeDiv) {
@@ -581,15 +584,14 @@ maskBtDoc.addEventListener('keydown', (e) => {
         timerModeSwitch(timerBtMode)
     }
 })
+let touchCount=0;
+maskBtDoc.addEventListener('click', () => {
+    
+    touchCount++;
+    console.log(touchCount);
 
-let touchStart;
-maskBtDoc.addEventListener('touchstart', () => {
-    touchStart = Date.now();
-    console.log('触摸开始');
-});
-maskBtDoc.addEventListener('touchend', () => {
-    console.log('触摸结束');
-    if (touchStart && 1000 < Date.now() - touchStart) {
+    if (touchCount > 1) {
+        touchCount =0;
         //看板更新
         maskBtDoc.style.visibility = 'hidden';
 
@@ -605,7 +607,6 @@ maskBtDoc.addEventListener('touchend', () => {
             logItem.duration = logItem.endDateTime - logItem.startDateTime;
             onOff(onOffDoc)
         }
-
     }
 });
 
