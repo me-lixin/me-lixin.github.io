@@ -2,8 +2,8 @@
 @font-face {
     font-family: "alimama";
     font-weight: 400;
-    src: url("/Users/lixin/project/web/simple-skills/font/P3YMrUl62Myz.woff2") format("woff2"),
-        url("/Users/lixin/project/web/simple-skills/font/P3YMrUl62Myz.woff") format("woff");
+    src: url("../font/P3YMrUl62Myz.woff2") format("woff2"),
+        url("../font/P3YMrUl62Myz.woff") format("woff");
     font-display: swap;
 }
 
