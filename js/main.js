@@ -70,6 +70,7 @@ formDoc.addEventListener('submit', (e) => {
         formData.append('id', id)
     }
     updateDataToStore(Object.fromEntries(formData))
+    contentShow();
 })
 //默认数据填充
 function defaultDataFill(data) {
