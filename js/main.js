@@ -925,11 +925,11 @@ canvas.addEventListener('mousemove', showTooltip);
 
 // 监听视口大小
 window.addEventListener('resize', (e) => {
-    if (window.innerWidth < 650) {
-        asideDoc.classList.toggle('display-none', true)
-        sectionDoc.classList.toggle('display-none', false);
-    } else {
-        asideDoc.classList.toggle('display-none', false)
-    }
+    // if (window.innerWidth < 650) {
+    //     asideDoc.classList.toggle('display-none', true)
+    //     sectionDoc.classList.toggle('display-none', false);
+    // } else {
+    //     asideDoc.classList.toggle('display-none', false)
+    // }
 })
 
