@@ -14,7 +14,7 @@ const formDoc = document.getElementById('skillForm')
 
 //indexDB常量
 const DB_NAME = 'skillManage';
-const DB_VERSION = 8;
+const DB_VERSION = 12;
 const DB_STORE_NAME = 'skill';
 const DB_MODE = 'readwrite';
 const MILLISECOND = 86400000;
@@ -104,13 +104,18 @@ function initalizeDB() {
         alert("请允许我的 web 应用使用 IndexedDB！");
     }
     request.onupgradeneeded = (e) => {
-        e.target.result.deleteObjectStore(DB_STORE_NAME)
+        console.log(e.oldVersion);
+        console.log(e);
+        if (e.oldVersion > 0) {
+            e.target.result.deleteObjectStore(DB_STORE_NAME)
+            e.target.result.deleteObjectStore('skillLog')
+        }
         let skillDB = e.target.result.createObjectStore(DB_STORE_NAME, { keyPath: 'id' })
-        e.target.result.deleteObjectStore('skillLog')
         let logStore = e.target.result.createObjectStore('skillLog', { keyPath: 'id', autoIncrement: true })
         logStore.createIndex('dateTime', 'dateTime', { unique: true });
         skillDB.createIndex('dateTime', 'dateTime', { unique: true });
         console.log('数据库构建');
+
     }
 }
 function createStore(mode, storeName) {
