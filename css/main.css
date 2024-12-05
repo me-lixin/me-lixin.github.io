@@ -364,7 +364,9 @@ label {
 .skill-form input {
     border-radius: 0.5rem;
 }
-
+.skill-form input[type='text']{
+    height: 3rem;
+}
 .duration {
     font-size: 1.4rem;
     color: #a22a2a;
