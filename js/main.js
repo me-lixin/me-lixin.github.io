@@ -119,10 +119,10 @@ function initalizeDB() {
         console.log('数据库打开');
         db = e.target.result;
         selectDataFromStore();
-        selectSkillLogToStatistics(1);
+        selectLogToStatistics(1);
         switchTag('log');
         const now = new Date();
-        selectSkillLogList(new Date(now.getFullYear(), now.getMonth(), now.getDate()).valueOf()
+        selectLog(new Date(now.getFullYear(), now.getMonth(), now.getDate()).valueOf()
             , Date.now());
     }
     request.onerror = (e) => {
@@ -177,7 +177,7 @@ function deleteSkill(dataId) {
         };
     })
 }
-function selectSkillLogToStatistics(offset) {
+function selectLogToStatistics(offset) {
     list = [];
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
@@ -255,7 +255,7 @@ function selectSkillLogToStatistics(offset) {
         initChart(offset == 1 ? 15 : 450);
     }
 }
-function selectSkillLogList(startTime, endTime) {
+function selectLog(startTime, endTime) {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
     if (startTime == 0) {
@@ -287,7 +287,7 @@ function selectSkillLogList(startTime, endTime) {
     }
 }
 
-function updateDataToStore2(data) {
+function updateLog(data) {
     if (data.duration < 60000) {
         return;
     }
@@ -505,7 +505,7 @@ function onOff(obj) {
         //保存日志
         logItem.endDateTime = Date.now();
         logItem.duration = logItem.endDateTime - logItem.startDateTime;
-        updateDataToStore2(logItem);
+        updateLog(logItem);
     } else {
         //开启日志
         logItem.startDateTime = Date.now();
@@ -634,7 +634,7 @@ loading.addEventListener('click', (e) => {
         const now = new Date();
         // selectSkillLogList(today.valueOf() - (MILLISECOND * (count + 1))
         //     , today.valueOf() - MILLISECOND * count);
-        selectSkillLogList(new Date(now.getFullYear(), now.getMonth(), now.getDate() - (count + 1)).valueOf()
+        selectLog(new Date(now.getFullYear(), now.getMonth(), now.getDate() - (count + 1)).valueOf()
             , new Date(now.getFullYear(), now.getMonth(), now.getDate() - count).valueOf() - 1);
         count++;
         loading.textContent = '点击加载历史数据'
@@ -644,7 +644,7 @@ loading.addEventListener('click', (e) => {
 })
 // 下载日志
 download.addEventListener('click', async (e) => {
-    const logList = await selectSkillLogList(0, Date.now())
+    const logList = await selectLog(0, Date.now())
     let logStr = '';
     for (const item of logList) {
         const content = document.createElement('p');
@@ -695,17 +695,17 @@ function switchTag(tagId) {
 swtichBtDoc.addEventListener('click', (e) => {
     if (e.target.textContent == '年') {
         e.target.textContent = '月';
-        selectSkillLogToStatistics(12);
+        selectLogToStatistics(12);
     } else {
         e.target.textContent = '年';
-        selectSkillLogToStatistics(1);
+        selectLogToStatistics(1);
     }
 })
 // 监听页面关闭
 window.addEventListener('unload', () => {
     logItem.endDateTime = Date.now();
     logItem.duration = logItem.endDateTime - logItem.startDateTime;
-    updateDataToStore2(logItem);
+    updateLog(logItem);
     if (currentPanel) updateDataToStore(currentPanel);
 })
 
