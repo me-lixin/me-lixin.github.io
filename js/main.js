@@ -11,6 +11,21 @@ const logInfoDoc = document.querySelector('.log-info');
 const maskBtDoc = document.querySelector('.mask');
 const maskDivDocs = document.querySelectorAll('.mask div');
 const formDoc = document.getElementById('skillForm')
+const menuBtDoc = document.querySelector('.menu');
+const timerBtMode = document.querySelector('.timer-mode');
+const liTagDocs = document.querySelectorAll('.content li');
+const download = document.querySelector('.download');
+const swtichBtDoc = document.querySelector('.switch');
+// 统计图
+const tooltip = document.querySelector('.tooltip');
+const offscreenCanvas = new OffscreenCanvas(300, 260);
+const offCtx = offscreenCanvas.getContext('2d');
+const canvas = document.getElementById('lineChart');
+const ctx = canvas.getContext('2d');
+// 计时
+const onOffDoc = document.querySelector('#onOff');
+const timeShows = document.querySelectorAll('.time-show');
+const reset = document.querySelector('#reset');
 
 //indexDB常量
 const DB_NAME = 'skillManage';
@@ -19,11 +34,21 @@ const DB_STORE_NAME = 'skill';
 const DB_MODE = 'readwrite';
 const MILLISECOND = 86400000;
 
-//全局
+//全局变量
 let db;
 let dataMap = new Map();
 let currentPanel;
-var list = [];
+let list = [];
+let logItem = {};
+let touchCount = 0;
+let count = 0;
+let timeStamp;
+let intervalId;
+let intervalId2;
+let dataXY = [];
+// 缓存图片资源
+const root = document.querySelector(':root');
+let bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
 
 formDoc.addEventListener('reset', () => {
     durationDoc[0].textContent = '600';
@@ -57,7 +82,6 @@ backDoc.addEventListener('click', () => {
     }
 })
 // 菜单按钮
-const menuBtDoc = document.querySelector('.menu');
 menuBtDoc.addEventListener('click', () => {
     contentShow('menu');
 })
@@ -152,8 +176,6 @@ function deleteSkill(dataId) {
             resolve(e.target.result)
         };
     })
-
-
 }
 function selectSkillLogToStatistics(offset) {
     list = [];
@@ -232,7 +254,6 @@ function selectSkillLogToStatistics(offset) {
         // 初次绘制
         initChart(offset == 1 ? 15 : 450);
     }
-    console.log(list);
 }
 function selectSkillLogList(startTime, endTime) {
     const store = createStore('readonly', 'skillLog');
@@ -441,13 +462,7 @@ function getSkillId() {
         return 1;
     }
 }
-// 计时
-const onOffDoc = document.querySelector('#onOff');
-const timeShows = document.querySelectorAll('.time-show');
-const reset = document.querySelector('#reset');
 
-let intervalId;
-let intervalId2;
 //暂停开始
 onOffDoc.addEventListener('click', (e) => {
     e.stopPropagation()
@@ -471,7 +486,6 @@ reset.addEventListener('click', (e) => {
 
     updateDataToStore(currentPanel);
 })
-let logItem = {};
 function getNowTime(value) {
     const date = new Date(value);
     return `${date.getHours() > 9 ? date.getHours() : '0' + date.getHours()}:${date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()}:${date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()}`
@@ -537,7 +551,6 @@ function run2() {
     // console.log(`${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`);
     timeShows[1].textContent = `${(currentPanel.h2 > 9 || currentPanel.h2 < 0) ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
 }
-const timerBtMode = document.querySelector('.timer-mode');
 timerBtMode.addEventListener('click', (e) => {
     e.stopPropagation()
     timerModeSwitch(e.target);
@@ -584,14 +597,13 @@ maskBtDoc.addEventListener('keydown', (e) => {
         timerModeSwitch(timerBtMode)
     }
 })
-let touchCount=0;
 maskBtDoc.addEventListener('click', () => {
-    
+
     touchCount++;
     console.log(touchCount);
 
     if (touchCount > 1) {
-        touchCount =0;
+        touchCount = 0;
         //看板更新
         maskBtDoc.style.visibility = 'hidden';
 
@@ -610,14 +622,11 @@ maskBtDoc.addEventListener('click', () => {
     }
 });
 
-const liTagDocs = document.querySelectorAll('.content li');
-
 // 监听标签切换
 contentDoc.addEventListener('click', (e) => {
     switchTag(e.target.id)
 })
 //加载更多日志
-let count = 0;
 loading.addEventListener('click', (e) => {
     loading.textContent = '加载中......'
     loading.disabled = true;
@@ -634,7 +643,6 @@ loading.addEventListener('click', (e) => {
     }, 500);
 })
 // 下载日志
-const download = document.querySelector('.download');
 download.addEventListener('click', async (e) => {
     const logList = await selectSkillLogList(0, Date.now())
     let logStr = '';
@@ -684,7 +692,6 @@ function switchTag(tagId) {
     }
 }
 // 监听图标切换
-const swtichBtDoc = document.querySelector('.switch');
 swtichBtDoc.addEventListener('click', (e) => {
     if (e.target.textContent == '年') {
         e.target.textContent = '月';
@@ -699,37 +706,25 @@ window.addEventListener('unload', () => {
     logItem.endDateTime = Date.now();
     logItem.duration = logItem.endDateTime - logItem.startDateTime;
     updateDataToStore2(logItem);
+    if (currentPanel) updateDataToStore(currentPanel);
 })
 
 // 后台运行逻辑
-// const worke = new Worker('js/timer.js')
-let timeStamp;
 document.addEventListener('visibilitychange', () => {
-    console.log('onOffDoc.value', onOffDoc.value);
-
     if (document.hidden && onOffDoc.value === 'off') {
         console.log('页面隐藏，降低任务频率');
         timeStamp = Date.now();
         clearInterval(intervalId);
         clearInterval(intervalId2);
-        // worke.postMessage(['start', currentPanel])
-        // 调整任务逻辑
     } else if (!document.hidden && onOffDoc.value === 'off') {
-        // worke.postMessage(['end'])
-        // worke.onmessage = (e) => {
-        //     currentPanel = e.data;
-        //     console.log('时间我的执行时间呢', e.data);
-        // }
         console.log('页面激活，恢复任务频率');
         // 恢复任务逻辑
         restorationTiem();
-
     }
 });
 function restorationTiem() {
     let timeDifference = Date.now() - timeStamp;
     // let timeDifference = MILLISECOND/24 ;
-
     let h = Math.trunc(timeDifference / 1000 / 60 / 60);
     let m = Math.trunc(timeDifference / 1000 / 60 % 60);
     let s = Math.trunc(timeDifference / 1000 % 60);
@@ -766,12 +761,6 @@ function restorationTiem() {
     intervalId2 = setInterval(run2, 1000);
 }
 
-// 统计图
-const tooltip = document.querySelector('.tooltip');
-const offscreenCanvas = new OffscreenCanvas(300, 260);
-const offCtx = offscreenCanvas.getContext('2d');
-const canvas = document.getElementById('lineChart');
-const ctx = canvas.getContext('2d');
 // 绘制坐标系和刻度
 function drawGrid(maxData) {
     const padding = 30;
@@ -851,7 +840,6 @@ function drawLine(maxData) {
     offCtx.lineWidth = 2;
     offCtx.stroke();
 }
-let dataXY = [];
 // 绘制数据点
 function drawDataPoints(maxData) {
     const padding = 30;
@@ -883,7 +871,6 @@ function showTooltip(event) {
     if (mouseX < padding || mouseY < padding / 2 || mouseX > canvas.width - padding / 2 || mouseY > canvas.height - padding) {
         ctx.drawImage(offscreenCanvas, 0, 0);
         tooltip.style.display = 'none';
-
         return;
     }
     const width = offscreenCanvas.width - padding * 2;
@@ -921,17 +908,26 @@ function initChart(maxData) {
     drawDataPoints(maxData);
     ctx.drawImage(offscreenCanvas, 0, 0);
 }
-
 // 监听鼠标移动事件
 canvas.addEventListener('mousemove', showTooltip);
-
-// 监听视口大小
-window.addEventListener('resize', (e) => {
-    // if (window.innerWidth < 650) {
-    //     asideDoc.classList.toggle('display-none', true)
-    //     sectionDoc.classList.toggle('display-none', false);
-    // } else {
-    //     asideDoc.classList.toggle('display-none', false)
-    // }
-})
-
+// 缓存图片资源
+for (const bg of bgArr) {
+    let url;
+    if (bg === 'background') {
+        url = 'images/' + bg + '.jpg'
+    } else {
+        url = 'images/' + bg + '.svg'
+    }
+    caches.match(url).then(response => {
+        if (!response) {
+            caches.open('my-cache').then(cache => cache.add(url));
+            fetch(url)
+            .then(resp => resp.blob())
+            .then((blob)=> root.style.setProperty('--'+bg+'-bg',`url('${URL.createObjectURL(blob)}')`));
+        }else{
+            return response.blob();
+        }
+    }).then(blob=>{
+       if(blob) root.style.setProperty('--'+bg+'-bg',`url('${URL.createObjectURL(blob)}')`)
+    })
+}
