@@ -324,7 +324,7 @@ aside {
 }
 
 .instruction {
-    padding: 2rem;
+    padding: 0rem 2rem 2rem 2rem;
 }
 
 /* 技能相页关操作 */
@@ -368,6 +368,7 @@ label {
     color: #325374;
     margin-top: 2rem;
     font-size: 1.4rem;
+    padding: 0rem 2rem 1rem 2rem;
 }
 
 .author-said li {
