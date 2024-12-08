@@ -14,7 +14,18 @@
     font-family: monospace, sans-serif;
     border-radius: 20px;
 }
-
+:root{
+    --background-bg:#dbd2ca;
+    --add-bg:#38332f;
+    --delete-bg:#38332f;
+    --increase-bg:#38332f;
+    --menu-bg:#38332f;
+    --reduce-bg:#38332f;
+    --reset-bg:#38332f;
+    --start-bg:#38332f;
+    --stop-bg:#38332f;
+    --return-bg:#38332f;
+}
 html {
     font-size: 10px;
     color: #484040;
@@ -26,7 +37,6 @@ body {
     min-width: 32rem;
     padding: 0.5rem;
     margin: 0.5rem;
-    background: #dbd2ca;
 }
 
 body button:hover {
@@ -78,7 +88,6 @@ footer {
 
 /* 头部样式 */
 header {
-    background: #dbd2ca;
     margin-top:-1rem;
     min-height: 7rem;
     padding: 0 2rem 0 1rem;
@@ -113,8 +122,7 @@ header .right-menu {
     width: 3.2rem;
     height: 3.2rem;
     border-style: hidden;
-    background: center / 68% 68% no-repeat url('../images/menu.svg'), #565858;
-
+    background: center / 68% 68% no-repeat var(--menu-bg), #565858;
 }
 
 header .logo-title {
@@ -146,14 +154,12 @@ main {
     display: flex;
     gap: 1rem;
     box-shadow: none;
-    /* background-color: aliceblue; */
 }
 
 section {
     flex: 5;
     display: flex;
     flex-flow: row wrap;
-    /* background-color: rgb(158, 107, 107); */
     overflow: auto;
     justify-content: start;
     gap: 1rem;
@@ -167,7 +173,6 @@ section div {
 
     width: 31rem;
     height: 37rem;
-    /* background-color: rgba(112, 140, 120, 0.238); */
     padding: 0rem 1rem 0.5rem 1rem;
     overflow: auto;
     position: relative;
@@ -186,6 +191,8 @@ h2 {
     bottom: 1rem;
     width: 5rem;
     height: 5rem;
+    border-radius: 4rem;
+    opacity: 0.7;
 }
 
 .delete-skill {
@@ -194,22 +201,20 @@ h2 {
     right: 0.5rem;
     width: 3rem;
     height: 3rem;
-    background: center / 70% 70% no-repeat url(../images/delete.svg);
+    /* background: center / 70% 70% no-repeat url(../images/delete.svg); */
+    background: var(--delete-bg);
 }
 
 .add-skill {
     width: 3.2rem;
     height: 3.2rem;
     border-style: hidden;
-    background: center / 70% 70% no-repeat url(../images/add.svg), green;
-
+    background: center / 70% 70% no-repeat var(--add-bg), green;
 }
 
 aside {
     box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2;
-    /* padding: 1rem; */
     flex: 2;
-    /* background-color: red; */
     min-width: 32rem;
     display: flex;
     flex-direction: column;
@@ -227,7 +232,6 @@ aside {
 .subnav {
     padding: 12px;
     height: 5rem;
-    background: #f6e4d4;
     position: sticky;
     top: 0rem;
     border-radius: 20px 20px 0px 0px;
@@ -237,7 +241,8 @@ aside {
     width: 3.2rem;
     height: 3.2rem;
     border-style: hidden;
-    background: center / 68% 68% no-repeat url('../images/return.svg'), #565858;
+    background: center / 68% 68% no-repeat var(--return-bg), #565858;
+    content: "返回";
     position: absolute;
     z-index: 1;
     left: 8px;
@@ -245,9 +250,7 @@ aside {
 }
 
 .content {
-    /* box-shadow: 3px 3px 28px #606362, 5px 3px 24px #b9b2b2; */
     flex: 30;
-    /* padding: 8px; */
     flex-flow: column;
     overflow: auto;
     height: 59rem;
@@ -282,11 +285,9 @@ aside {
 }
 
 .log-info {
-    /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
     padding: 2rem;
     overflow: auto;
     height: 59rem;
-    /* background-color: rgb(105, 210, 191); */
 }
 
 #loading {
@@ -310,8 +311,6 @@ aside {
 
 .statistics {
     padding: 1rem;
-    /* box-shadow: 3px 3px 28px #606362,  5px 3px 24px #b9b2b2; */
-    /* background-color: rgb(140, 164, 216); */
     position: relative;
     text-align: center;
 
@@ -319,16 +318,11 @@ aside {
 
 .instruction {
     padding: 2rem;
-    /* background-color: rgb(53, 160, 29); */
-
 }
 
 /* 技能相页关操作 */
 .skill-info {
     flex: 30;
-    /* width: 100%; */
-    /* height: 100%; */
-    /* background-color: rgb(246, 232, 75); */
     padding: 1rem 3rem 3rem 3rem;
     overflow: auto;
 }
@@ -348,7 +342,6 @@ label {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    /* width: 100%; */
 }
 
 .skill-form input {
@@ -398,36 +391,33 @@ label {
     display: flex;
     flex-flow: column wrap;
     border-radius: 0;
-    background: center / cover no-repeat url('../images/background.jpg');
+    background: center / cover no-repeat var(--background-bg);
 }
 
 .time-show {
     color: aliceblue;
     font-size: 9rem;
-
 }
 
 .off {
-    background: center / 95% 95% no-repeat url('../images/stop.svg');
+    background: center / 95% 95% no-repeat var(--stop-bg),white;
 }
 
 .on {
-    background: center / 100% 100% no-repeat url('../images/start.svg');
+    background: center / 100% 100% no-repeat var(--start-bg),white;
 }
 
 .increase {
-    background: left 12px/ 50% 50% no-repeat url('../images/increase.svg');
+    background: left 12px/ 50% 50% no-repeat var(--increase-bg),white;
 }
 
 .reduce {
-    background: left 12px/ 50% 50% no-repeat url('../images/reduce.svg');
-
+    background: left 12px/ 50% 50% no-repeat var(--reduce-bg),white;
 }
 
 .on-off {
     border-style: hidden;
     padding: 1.5rem;
-    background-color: white;
     border-radius: 5rem;
     opacity: 0.7;
     width: 8rem;
@@ -442,7 +432,6 @@ label {
     padding: 1.5rem 0 1.5rem 3.5rem;
     width: 14rem;
     margin-top: 7rem;
-    background-color: white;
     opacity: 0.5;
 }
 
@@ -453,7 +442,7 @@ label {
 }
 
 .reset {
-    background: center / 100% 100% no-repeat url('../images/reset.svg'), white;
+    background: center / 100% 100% no-repeat var(--reset-bg), white;
 }
 
 /* 页尾样式 */
@@ -463,7 +452,6 @@ footer {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* background-color: rebeccapurple; */
 }
 
 /* 浏览器视口宽度小于650px*/
@@ -483,6 +471,6 @@ footer {
     body,
     header,
     .subnav {
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), center / cover no-repeat url(../images/background.jpg);
-    }
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), center / cover no-repeat var(--background-bg);
+     }
 }
