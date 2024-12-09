@@ -299,7 +299,13 @@ function updateLog(data) {
     };
 }
 function logPanel(data) {
-    const firstLog = logInfoDoc.firstElementChild;
+    let firstLog = logInfoDoc.firstElementChild;
+    if (firstLog.textContent != getNowDate(data.startDateTime)) {
+        let newFirstLog = document.createElement('p');
+        newFirstLog.innerHTML = `<strong>${getNowDate(data.startDateTime)}</strong>`;
+        firstLog.before(newFirstLog);
+        firstLog = newFirstLog;
+    }
     const content = document.createElement('p');
     let hours = Math.trunc(data.duration / 1000 / 60 / 60);
     let minutes = Math.trunc(data.duration / 1000 / 60 % 60);
