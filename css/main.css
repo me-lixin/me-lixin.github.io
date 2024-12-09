@@ -452,6 +452,15 @@ label {
 .reset {
     background: center / 100% 100% no-repeat var(--reset-bg), white;
 }
+.warning{
+    color: red;
+    font-size: 4rem;
+    opacity: 0.5;
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
 
 /* 页尾样式 */
 footer {
