@@ -11,6 +11,32 @@
     <script type="module" src="js/dom.js"></script>
     <!-- <script defer src="js/main.js"></script> -->
     <link rel="stylesheet" href="css/main.css">
+    <script>
+        // 缓存图片资源
+        const root = document.querySelector(':root');
+        let bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
+        for (const bg of bgArr) {
+            let url;
+            if (bg === 'background') {
+                url = 'images/' + bg + '.jpg'
+            } else {
+                url = 'images/' + bg + '.svg'
+            }
+            caches.match(url).then(response => {
+                if (!response) {
+                    caches.open('my-cache').then(cache => cache.add(url));
+                    fetch(url)
+                        .then(resp => resp.blob())
+                        .then((blob) => root.style.setProperty('--' + bg + '-bg', `url('${URL.createObjectURL(blob)}')`));
+                } else {
+                    console.log('加载缓存');
+                    return response.blob();
+                }
+            }).then(blob => {
+                if (blob) root.style.setProperty('--' + bg + '-bg', `url('${URL.createObjectURL(blob)}')`)
+            })
+        }
+    </script>
 </head>
 
 <body>
@@ -126,7 +152,7 @@
                                 学习的时间越集中越有效!
                             </li>
                             <li>
-                                再没啥了,练呗! 
+                                再没啥了,练呗!
                             </li>
                         </ol>
                         <h2>注意:
