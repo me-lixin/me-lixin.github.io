@@ -326,27 +326,3 @@ statistics.canvas.addEventListener('mousemove', (e)=>{
     statistics.showTooltip(e);
 
 })
-
-// 缓存图片资源
-const root = document.querySelector(':root');
-let bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
-for (const bg of bgArr) {
-    let url;
-    if (bg === 'background') {
-        url = 'images/' + bg + '.jpg'
-    } else {
-        url = 'images/' + bg + '.svg'
-    }
-    caches.match(url).then(response => {
-        if (!response) {
-            caches.open('my-cache').then(cache => cache.add(url));
-            fetch(url)
-                .then(resp => resp.blob())
-                .then((blob) => root.style.setProperty('--' + bg + '-bg', `url('${URL.createObjectURL(blob)}')`));
-        } else {
-            return response.blob();
-        }
-    }).then(blob => {
-        if (blob) root.style.setProperty('--' + bg + '-bg', `url('${URL.createObjectURL(blob)}')`)
-    })
-}
