@@ -70,7 +70,7 @@ tiemLog.logInfoDoc = logInfoDoc;
 const now = new Date();
 tiemLog.selectLog(new Date(now.getFullYear(), now.getMonth(), now.getDate()).valueOf()
     , Date.now());
-SKLayout.contentShow(sectionDoc, contentDoc, skillInfoDoc, asideDoc, 'menu');
+SKLayout.contentShow(sectionDoc, contentDoc, skillInfoDoc, asideDoc);
 // 创建报表对象
 const statistics = new Statistics();
 tiemLog.selectLogToStatistics(1, statistics);
