@@ -575,6 +575,7 @@ function timerModeSwitch(modeDiv) {
         maskDivDocs[1].style.display = 'block';
     }
 }
+// 键盘事件
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
     console.log(e.code);
@@ -602,8 +603,8 @@ maskBtDoc.addEventListener('keydown', (e) => {
         timerModeSwitch(timerBtMode)
     }
 })
+// 蒙版双击事件
 maskBtDoc.addEventListener('click', () => {
-
     touchCount++;
     console.log(touchCount);
 
@@ -625,6 +626,9 @@ maskBtDoc.addEventListener('click', () => {
             onOff(onOffDoc)
         }
     }
+    setTimeout(()=>{
+        touchCount = 0;
+    },800)
 });
 
 // 监听标签切换
@@ -696,7 +700,7 @@ function switchTag(tagId) {
             break;
     }
 }
-// 监听图标切换
+// 监听报表切换
 swtichBtDoc.addEventListener('click', (e) => {
     if (e.target.textContent == '年') {
         e.target.textContent = '月';
