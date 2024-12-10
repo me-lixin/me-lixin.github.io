@@ -17,15 +17,15 @@
 /* 使用CSS变量 */
 :root{
     --background-bg:#dbd2ca;
-    --add-bg:#38332f;
-    --delete-bg:#38332f;
-    --increase-bg:#38332f;
-    --menu-bg:#38332f;
-    --reduce-bg:#38332f;
-    --reset-bg:#38332f;
-    --start-bg:#38332f;
-    --stop-bg:#38332f;
-    --return-bg:#38332f;
+    --add-bg:#dbd2ca;
+    --delete-bg:#dbd2ca;
+    --increase-bg:#dbd2ca;
+    --menu-bg:#dbd2ca;
+    --reduce-bg:#dbd2ca;
+    --reset-bg:#dbd2ca;
+    --start-bg:#dbd2ca;
+    --stop-bg:#dbd2ca;
+    --return-bg:#dbd2ca;
 }
 html {
     font-size: 10px;
@@ -208,8 +208,7 @@ h2 {
     right: 0.5rem;
     width: 3rem;
     height: 3rem;
-    /* background: center / 70% 70% no-repeat url(../images/delete.svg); */
-    background: var(--delete-bg);
+    background: center / 70% 70% no-repeat var(--delete-bg);
 }
 
 .add-skill {
@@ -439,13 +438,13 @@ label {
     border-style: hidden;
     padding: 1.5rem 0 1.5rem 3.5rem;
     width: 14rem;
+    height: 6rem;
     margin-top: 7rem;
     opacity: 0.5;
 }
 
 .mask div {
     flex: 1;
-    /* background-color: aqua; */
     width: 100%;
 }
 
