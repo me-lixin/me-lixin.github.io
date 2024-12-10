@@ -8,8 +8,8 @@
     <meta name="author" content="怪咖学生">
     <title>朴素技能管理</title>
     <link rel="icon" href="logo.svg" sizes="16px">
-    <!-- <script type="module" src="js/main.js"></script> -->
-    <script defer src="js/main.js"></script>
+    <script type="module" src="js/dom.js"></script>
+    <!-- <script defer src="js/main.js"></script> -->
     <link rel="stylesheet" href="css/main.css">
 </head>
 
@@ -38,7 +38,7 @@
                     <label for="skillName">技能名：</label>
                     <input id="skillName" type="text" name="skillName" minlength="1" maxlength="10" required>
 
-                    <label for="skillTime">所需时间：<span class="duration"></span>(h)</label>
+                    <label for="skillTime">所需时间：<span class="duration">600</span>(h)</label>
                     <input id="skillTime" type="range" name="skillTime" min="200" max="1000" step="10"
                         list="skillTickmarks">
                     <datalist id="skillTickmarks">
@@ -48,7 +48,7 @@
                         <option value="800" label="800"></option>
                         <option value="1000" label="1000"></option>
                     </datalist>
-                    <label for="todayTime">每日投入时间：<span class="duration"></span>(h)</label>
+                    <label for="todayTime">每日投入时间：<span class="duration">9</span>(h)</label>
                     <input id="todayTime" type="range" name="todayTime" min="3" max="15" list="todayTickmarks">
                     <datalist id="todayTickmarks">
                         <option value="3" label="&nbsp;3"></option>
@@ -140,8 +140,6 @@
                 </div>
             </div>
         </aside>
-
-
     </main>
     <footer>
         <div>
