@@ -609,7 +609,6 @@ maskBtDoc.addEventListener('click', () => {
     console.log(touchCount);
 
     if (touchCount > 1) {
-        touchCount = 0;
         //看板更新
         maskBtDoc.style.visibility = 'hidden';
 
