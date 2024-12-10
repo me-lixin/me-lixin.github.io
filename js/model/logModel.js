@@ -114,7 +114,6 @@ export class TimeLog {
     }
     // 添加
     updateLog(data) {
-        data.duration = 122211223
         if (data.duration < 60000) {
             return;
         }
