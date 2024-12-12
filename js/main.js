@@ -127,12 +127,10 @@ function initalizeDB() {
         alert("请允许我的 web 应用使用 IndexedDB！");
     }
     request.onupgradeneeded = (e) => {
-        console.log(e.oldVersion);
-        console.log(e);
-        if (e.oldVersion > 0) {
-            e.target.result.deleteObjectStore(DB_STORE_NAME)
-            e.target.result.deleteObjectStore('skillLog')
-        }
+        // if (e.oldVersion > 0) {
+        //     e.target.result.deleteObjectStore(DB_STORE_NAME)
+        //     e.target.result.deleteObjectStore('skillLog')
+        // }
         let skillDB = e.target.result.createObjectStore(DB_STORE_NAME, { keyPath: 'id' })
         let logStore = e.target.result.createObjectStore('skillLog', { keyPath: 'id', autoIncrement: true })
         logStore.createIndex('dateTime', 'dateTime', { unique: true });
