@@ -15,7 +15,7 @@
     border-radius: 20px;
 }
 /* 使用CSS变量 */
-/* :root{
+:root{
     --background-bg:#dbd2ca;
     --add-bg:#dbd2ca;
     --delete-bg:#dbd2ca;
@@ -26,8 +26,7 @@
     --start-bg:#dbd2ca;
     --stop-bg:#dbd2ca;
     --return-bg:#dbd2ca;
-    --logo-bg:#dbd2ca;
-} */
+}
 html {
     font-size: 10px;
     color: #484040;
@@ -60,7 +59,7 @@ body li {
 body,
 header,
 .subnav {
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), center / cover no-repeat url('/images/background.jpg');
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), center / cover no-repeat var(--background-bg);
  }
 
 /* 隐藏类 */
@@ -106,8 +105,7 @@ header {
     z-index: 99;
 }
 
-header .img {
-    background: center/ 100% 100% no-repeat url('/images/logo.svg');
+header img {
     width: 6rem;
     height: 6rem;
 }
@@ -131,7 +129,7 @@ header .right-menu {
     width: 3.2rem;
     height: 3.2rem;
     border-style: hidden;
-    background: center / 68% 68% no-repeat url('/images/menu.svg'), #565858;
+    background: center / 68% 68% no-repeat var(--menu-bg), #565858;
 }
 
 header .logo-title {
@@ -210,14 +208,14 @@ h2 {
     right: 0.5rem;
     width: 3rem;
     height: 3rem;
-    background: center / 70% 70% no-repeat url('/images/delete.svg');
+    background: center / 70% 70% no-repeat var(--delete-bg);
 }
 
 .add-skill {
     width: 3.2rem;
     height: 3.2rem;
     border-style: hidden;
-    background: center / 70% 70% no-repeat url('/images/add.svg'), green;
+    background: center / 70% 70% no-repeat var(--add-bg), green;
 }
 
 aside {
@@ -249,7 +247,7 @@ aside {
     width: 3.2rem;
     height: 3.2rem;
     border-style: hidden;
-    background: center / 68% 68% no-repeat url('/images/return.svg'), #565858;
+    background: center / 68% 68% no-repeat var(--return-bg), #565858;
     content: "返回";
     position: absolute;
     z-index: 1;
@@ -400,7 +398,7 @@ label {
     display: flex;
     flex-flow: column wrap;
     border-radius: 0;
-    background: center / cover no-repeat url('/images/background.jpg');
+    background: center / cover no-repeat var(--background-bg);
 }
 
 .time-show {
@@ -409,19 +407,19 @@ label {
 }
 
 .off {
-    background: center / 95% 95% no-repeat url('/images/stop.svg'),white;
+    background: center / 95% 95% no-repeat var(--stop-bg),white;
 }
 
 .on {
-    background: center / 100% 100% no-repeat url('/images/start.svg'),white;
+    background: center / 100% 100% no-repeat var(--start-bg),white;
 }
 
 .increase {
-    background: left 12px/ 50% 50% no-repeat url('/images/increase.svg'),white;
+    background: left 12px/ 50% 50% no-repeat var(--increase-bg),white;
 }
 
 .reduce {
-    background: left 12px/ 50% 50% no-repeat url('/images/reduce.svg'),white;
+    background: left 12px/ 50% 50% no-repeat var(--reduce-bg),white;
 }
 
 .on-off {
@@ -451,7 +449,7 @@ label {
 }
 
 .reset {
-    background: center / 100% 100% no-repeat url('/images/reset.svg'), white;
+    background: center / 100% 100% no-repeat var(--reset-bg), white;
 }
 .warning{
     color: red;
