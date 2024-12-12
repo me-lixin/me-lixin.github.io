@@ -47,8 +47,9 @@ let intervalId;
 let intervalId2;
 let dataXY = [];
 // 缓存图片资源
-const root = document.querySelector(':root');
-let bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
+// const root = document.querySelector(':root');
+// const bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return', 'logo'];
+
 
 formDoc.addEventListener('reset', () => {
     durationDoc[0].textContent = '600';
@@ -65,9 +66,7 @@ contentShow();
 // 添加技能按钮
 addSkillDoc.addEventListener('click', () => {
     let hiddenNode = document.querySelector('#id')
-    if (hiddenNode) {
-        hiddenNode.parentNode.removeChild(hiddenNode);
-    }
+    hiddenNode?.parentNode.removeChild(hiddenNode);
     formDoc.reset();
     contentShow('skill');
 })
@@ -198,13 +197,13 @@ function selectLogToStatistics(offset) {
             if (num <= 0) {
                 let lastDay = lastMax + num;
                 list.push({
-                    'label': `${now.getMonth() > 9 ? now.getMonth() : '0' + now.getMonth()}-${lastDay > 9 ? lastDay : '0' + lastDay}`
+                    'label': `${now.getMonth().toString().padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`
                     , 'month': now.getMonth() - 1, 'day': lastDay
                 });
                 num++;
             } else {
                 list.push({
-                    'label': `${now.getMonth() + 1 > 9 ? now.getMonth() + 1 : '0' + now.getMonth() + 1}-${num > 9 ? num : '0' + num}`
+                    'label': `${(now.getMonth() + 1).toString().padStart(2, '0')}-${num.toString().padStart(2, '0')}`
                     , 'month': now.getMonth(), 'day': num
                 });
                 num++;
@@ -219,13 +218,13 @@ function selectLogToStatistics(offset) {
             if (num < 0) {
                 let month = lastMax + num;
                 list.push({
-                    'label': `${now.getFullYear() > 9 ? now.getFullYear() - 1 : '0' + now.getFullYear()}-${month + 1 > 9 ? month + 1 : '0' + (month + 1)}`
+                    'label': `${now.getFullYear() - 1}-${(month + 1).toString().padStart(2, '0')}`
                     , 'year': now.getFullYear() - 1, 'month': month
                 });
                 num++;
             } else {
                 list.push({
-                    'label': `${now.getFullYear() + 1 > 9 ? now.getFullYear() : '0' + now.getFullYear() + 1}-${num + 1 > 9 ? num + 1 : '0' + (num + 1)}`
+                    'label': `${now.getFullYear()}-${(num + 1).toString().padStart(2, '0')}`
                     , 'year': now.getFullYear(), 'month': num
                 });
                 num++;
@@ -251,6 +250,8 @@ function selectLogToStatistics(offset) {
             list[i].data = Math.floor(sum / 1000 / 60 / 60);
         }
         // 初次绘制
+        console.log(list);
+
         initChart(offset == 1 ? 15 : 450);
     }
 }
@@ -360,8 +361,8 @@ sectionDoc.addEventListener('click', async (e) => {
         maskBtDoc.focus();
         currentPanel = dataMap.get(divDoc.id)
         onOffDoc.value = 'on';
-        timeShows[0].textContent = `${currentPanel.h > 9 ? currentPanel.h : '0' + currentPanel.h}:${currentPanel.m > 9 ? currentPanel.m : '0' + currentPanel.m}:${currentPanel.s > 9 ? currentPanel.s : '0' + currentPanel.s}`;
-        timeShows[1].textContent = `${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
+        timeShows[0].textContent = `${currentPanel.h.toString().padStart(2, '0')}:${currentPanel.m.toString().padStart(2, '0')}:${currentPanel.s.toString().padStart(2, '0')}`;
+        timeShows[1].textContent = `${currentPanel.h2.toString().padStart(2, '0')}:${currentPanel.m2.toString().padStart(2, '0')}:${currentPanel.s2.toString().padStart(2, '0')}`;
 
         if (currentPanel.timerMode === '0') {
             timerBtMode.textContent = '倒计时';
@@ -473,6 +474,7 @@ onOffDoc.addEventListener('click', (e) => {
     e.stopPropagation()
     onOff(e.target);
 })
+// 重置今日数据
 reset.addEventListener('click', (e) => {
     e.stopPropagation()
     //保存日志
@@ -486,18 +488,18 @@ reset.addEventListener('click', (e) => {
     currentPanel.h2 = currentPanel.todayTime;
     currentPanel.m2 = 0;
     currentPanel.s2 = 0;
-    timeShows[1].textContent = `${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
-    timeShows[0].textContent = `${currentPanel.h > 9 ? currentPanel.h : '0' + currentPanel.h}:${currentPanel.m > 9 ? currentPanel.m : '0' + currentPanel.m}:${currentPanel.s > 9 ? currentPanel.s : '0' + currentPanel.s}`;
+    timeShows[1].textContent = `${currentPanel.h2.toString().padStart(2, '0')}:${currentPanel.m2.toString().padStart(2, '0')}:${currentPanel.s2.toString().padStart(2, '0')}`;
+    timeShows[0].textContent = `${currentPanel.h.toString().padStart(2, '0')}:${currentPanel.m.toString().padStart(2, '0')}:${currentPanel.s.toString().padStart(2, '0')}`;
 
     updateDataToStore(currentPanel);
 })
 function getNowTime(value) {
     const date = new Date(value);
-    return `${date.getHours() > 9 ? date.getHours() : '0' + date.getHours()}:${date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes()}:${date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()}`
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
 }
 function getNowDate(value) {
     const date = new Date(value);
-    return `${date.getFullYear()}-${date.getMonth() + 1 > 9 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)}-${date.getDate() > 9 ? date.getDate() : '0' + date.getDate()}`
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
 }
 
 function onOff(obj) {
@@ -537,7 +539,7 @@ function run() {
         currentPanel.m = 0;
         currentPanel.h++;
     }
-    timeShows[0].textContent = `${currentPanel.h > 9 ? currentPanel.h : '0' + currentPanel.h}:${currentPanel.m > 9 ? currentPanel.m : '0' + currentPanel.m}:${currentPanel.s > 9 ? currentPanel.s : '0' + currentPanel.s}`;
+    timeShows[0].textContent = `${currentPanel.h.toString().padStart(2, '0')}:${currentPanel.m.toString().padStart(2, '0')}:${currentPanel.s.toString().padStart(2, '0')}`;
 
 }
 
@@ -553,8 +555,7 @@ function run2() {
         currentPanel.m2--;
     }
     currentPanel.s2--;
-    // console.log(`${currentPanel.h2 > 9 ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`);
-    timeShows[1].textContent = `${(currentPanel.h2 > 9 || currentPanel.h2 < 0) ? currentPanel.h2 : '0' + currentPanel.h2}:${currentPanel.m2 > 9 ? currentPanel.m2 : '0' + currentPanel.m2}:${currentPanel.s2 > 9 ? currentPanel.s2 : '0' + currentPanel.s2}`;
+    timeShows[1].textContent = `${currentPanel.h2.toString().padStart(2, '0')}:${currentPanel.m2.toString().padStart(2, '0')}:${currentPanel.s2.toString().padStart(2, '0')}`;
 }
 timerBtMode.addEventListener('click', (e) => {
     e.stopPropagation()
@@ -625,9 +626,9 @@ maskBtDoc.addEventListener('click', () => {
             onOff(onOffDoc)
         }
     }
-    setTimeout(()=>{
+    setTimeout(() => {
         touchCount = 0;
-    },800)
+    }, 800)
 });
 
 // 监听标签切换
@@ -881,11 +882,6 @@ function showTooltip(event) {
         tooltip.style.display = 'none';
         return;
     }
-    const width = offscreenCanvas.width - padding * 2;
-    const height = offscreenCanvas.height - padding * 2;
-    const stepX = width / (list.length - 1);
-    const stepY = height / list.length == 12 ? 450 : 15;
-
     ctx.drawImage(offscreenCanvas, 0, 0);
     ctx.beginPath();
     ctx.moveTo(padding, mouseY);
@@ -895,7 +891,9 @@ function showTooltip(event) {
     ctx.strokeStyle = '#8a8a8a';
     ctx.stroke();
     dataXY.some((item, i) => {
-        if (Math.floor(item.x / 10) == Math.floor(mouseX / 10)) {
+        let dx = mouseX - item.x;
+        let sqrtX = Math.sqrt(dx ** 2);
+        if (sqrtX <= 3) {
             tooltip.style.display = 'block';
             tooltip.style.left = `${mouseX + 10}px`;
             tooltip.style.top = `${mouseY - 30}px`;
@@ -918,24 +916,33 @@ function initChart(maxData) {
 }
 // 监听鼠标移动事件
 canvas.addEventListener('mousemove', showTooltip);
+
 // 缓存图片资源
-for (const bg of bgArr) {
-    let url;
-    if (bg === 'background') {
-        url = 'images/' + bg + '.jpg'
-    } else {
-        url = 'images/' + bg + '.svg'
+// for (const bg of bgArr) {
+//     let url;
+//     if (bg === 'background') {
+//         url = 'images/' + bg + '.jpg'
+//     } else {
+//         url = 'images/' + bg + '.svg'
+//     }
+//     caches.match(url).then(async (response) => {
+//         if (!response) {
+//             let resp = await fetch(url);
+//             let cache = await caches.open('pictureV1');
+//             cache.put(url, resp.clone())
+//             return resp.blob();
+//         } else {
+//             return response.blob();
+//         }
+//     }).then(blob => {
+//         if (blob) root.style.setProperty('--' + bg + '-bg', `url('${URL.createObjectURL(blob)}')`);
+//     })
+// }
+
+function registerServiceWorker(){
+    if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('/serviceWorker.js').then((result)=>console.log(result)
+        );
     }
-    caches.match(url).then(response => {
-        if (!response) {
-            caches.open('my-cache').then(cache => cache.add(url));
-            fetch(url)
-            .then(resp => resp.blob())
-            .then((blob)=> root.style.setProperty('--'+bg+'-bg',`url('${URL.createObjectURL(blob)}')`));
-        }else{
-            return response.blob();
-        }
-    }).then(blob=>{
-       if(blob) root.style.setProperty('--'+bg+'-bg',`url('${URL.createObjectURL(blob)}')`)
-    })
 }
+registerServiceWorker();
