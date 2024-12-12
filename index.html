@@ -7,23 +7,25 @@
     <meta name="description" content="朴素的技能管理网站,采用简单而有效的方式帮助你获得技能--小众且非凡.">
     <meta name="author" content="怪咖学生">
     <title>朴素技能管理</title>
-    <link rel="icon" href="logo.svg" sizes="16px">
-    <!-- <script type="module" src="js/dom.js"></script> -->
+    <!-- <link rel="preload" href="js/main.js" as="script"> -->
+    <!-- <link rel="preload" href="css/main.css" as="style"> -->
     <script defer src="js/main.js"></script>
+    <link rel="icon" href="images/logo.svg" sizes="16px">
+    <!-- <script type="module" src="js/dom.js"></script> -->
     <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
     <header>
         <div class="logo-title">
-            <img src="logo.svg" alt="logo">
+            <div class="img"></div>
             <h1>朴素d技能</h1>
         </div>
         <div class="right">
             <p class="ambition">你差一口气,气吞山河的气!</p>
             <div class="right-menu">
-                <button class="add-skill" type="button"></button>
-                <button class="menu" type="button"></button>
+                <button class="add-skill" type="button" aria-label="添加"></button>
+                <button class="menu" type="button" aria-label="菜单"></button>
             </div>
         </div>
     </header>
@@ -31,7 +33,7 @@
         <section>
         </section>
         <aside>
-            <button type="button" class="return"></button>
+            <button type="button" class="return" aria-label="返回"></button>
             <div class="skill-info">
                 <h2>SKILL</h2>
                 <form id="skillForm" class="skill-form">
@@ -158,7 +160,7 @@
     </footer>
     <div class="mask" tabindex="-1">
         <div>
-            <button class="timer-mode" type="button"></button>
+            <button class="timer-mode" type="button" aria-label="模式切换"></button>
         </div>
         <div>
             <p class="time-show"></p>
@@ -167,8 +169,8 @@
             <p class="time-show"></p>
         </div>
         <div class="wind-up-an-account">
-            <button id="onOff" class="on-off" type="button" value="on"></button>
-            <button id="reset" class="reset on-off display-none" type="button"></button>
+            <button id="onOff" class="on-off" type="button" value="on" aria-label="开始/暂停"></button>
+            <button id="reset" class="reset on-off display-none" type="button" aria-label="停止"></button>
         </div>
         <h3 class="warning">生不如死</h2>
     </div>
