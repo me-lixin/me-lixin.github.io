@@ -47,8 +47,8 @@ let intervalId;
 let intervalId2;
 let dataXY = [];
 // 缓存图片资源
-// const root = document.querySelector(':root');
-// const bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return', 'logo'];
+const root = document.querySelector(':root');
+const bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
 
 
 formDoc.addEventListener('reset', () => {
@@ -918,26 +918,26 @@ function initChart(maxData) {
 canvas.addEventListener('mousemove', showTooltip);
 
 // 缓存图片资源
-// for (const bg of bgArr) {
-//     let url;
-//     if (bg === 'background') {
-//         url = 'images/' + bg + '.jpg'
-//     } else {
-//         url = 'images/' + bg + '.svg'
-//     }
-//     caches.match(url).then(async (response) => {
-//         if (!response) {
-//             let resp = await fetch(url);
-//             let cache = await caches.open('pictureV1');
-//             cache.put(url, resp.clone())
-//             return resp.blob();
-//         } else {
-//             return response.blob();
-//         }
-//     }).then(blob => {
-//         if (blob) root.style.setProperty('--' + bg + '-bg', `url('${URL.createObjectURL(blob)}')`);
-//     })
-// }
+for (const bg of bgArr) {
+    let url;
+    if (bg === 'background') {
+        url = 'images/' + bg + '.jpg'
+    } else {
+        url = 'images/' + bg + '.svg'
+    }
+    caches.match(url).then(async (response) => {
+        if (!response) {
+            let resp = await fetch(url);
+            let cache = await caches.open('pictureV1');
+            cache.put(url, resp.clone())
+            return resp.blob();
+        } else {
+            return response.blob();
+        }
+    }).then(blob => {
+        if (blob) root.style.setProperty('--' + bg + '-bg', `url('${URL.createObjectURL(blob)}')`);
+    })
+}
 
 function registerServiceWorker(){
     if('serviceWorker' in navigator){
