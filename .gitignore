@@ -16,3 +16,7 @@ __pycache__/
 *.pyc
 # VS Code 设置文件
 .vscode/
+/.idea/.gitignore
+/.idea/modules.xml
+/.idea/simple-skills.iml
+/.idea/vcs.xml

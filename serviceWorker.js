@@ -1,4 +1,4 @@
-// 离线页面和资源
+// 监听请求
 self.addEventListener("fetch", (event) => {
     event.respondWith(
     caches.match(event.request).then(async (response) => {
@@ -12,7 +12,7 @@ self.addEventListener("fetch", (event) => {
     })
     );
 })
-
+//监听sw安装
 self.addEventListener("install", (event) => {
     console.log('清理缓存');
     self.skipWaiting();
@@ -27,11 +27,12 @@ self.addEventListener("install", (event) => {
     );
 
 });
+//将页面放进缓存
 const addResourcesToCache = async (resources) => {
     const cache = await caches.open("v5");
     await cache.addAll(resources);
 };
-
+//监听激活
 self.addEventListener('activate', event => {
     console.log('添加缓存');
     clients.claim();
@@ -56,5 +57,4 @@ self.addEventListener('activate', event => {
             "images/stop.svg",
         ]),
     );
-
 });
