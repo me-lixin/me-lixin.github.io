@@ -250,7 +250,7 @@ function selectLogToStatistics(offset) {
         // 初次绘制
         console.log(list);
 
-        initChart(offset == 1 ? 15 : 450);
+        initChart(offset == 1 ? 18 : 450);
     }
 }
 function selectLog(startTime, endTime) {
@@ -784,13 +784,13 @@ function drawGrid(maxData) {
     offCtx.strokeStyle = '#000';
     offCtx.stroke();
     offCtx.font = '14px monospace';
-    offCtx.fillText(maxData == 15 ? '月度统计' : '年度统计', offscreenCanvas.width / 2, padding / 2);
+    offCtx.fillText(maxData == 18 ? '月度统计' : '年度统计', offscreenCanvas.width / 2, padding / 2);
     offCtx.font = '12px monospace';
 
     // 绘制 X 轴刻度
     list.forEach((item, i) => {
         const x = padding + i * stepX;
-        if (maxData == 15 && i != 0 && i % 4 == 0) {
+        if (maxData == 18 && i != 0 && i % 4 == 0) {
             offCtx.moveTo(x, offscreenCanvas.height - padding)
             offCtx.lineTo(x, offscreenCanvas.height - padding + 5)
             offCtx.stroke();
@@ -807,7 +807,7 @@ function drawGrid(maxData) {
     // 绘制 Y 轴刻度
     for (let i = 0; i <= maxData; i++) {
         const y = offscreenCanvas.height - padding - (i * stepY);
-        if (maxData == 15 && i != 0 && i % 3 == 0) {
+        if (maxData == 18 && i != 0 && i % 3 == 0) {
             offCtx.moveTo(padding - 5, y)
             offCtx.lineTo(padding, y)
             offCtx.stroke();
