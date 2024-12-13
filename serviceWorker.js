@@ -13,20 +13,20 @@ self.addEventListener("fetch", (event) => {
     );
 })
 //监听sw安装
-self.addEventListener("install", (event) => {
-    console.log('清理缓存');
-    self.skipWaiting();
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    return caches.delete(cacheName);
-                })
-            );
-        })
-    );
+// self.addEventListener("install", (event) => {
+    // console.log('清理缓存');
+    // self.skipWaiting();
+    // event.waitUntil(
+    //     caches.keys().then(cacheNames => {
+    //         return Promise.all(
+    //             cacheNames.map(cacheName => {
+    //                 return caches.delete(cacheName);
+    //             })
+    //         );
+    //     })
+    // );
 
-});
+// });
 //将页面放进缓存
 const addResourcesToCache = async (resources) => {
     const cache = await caches.open("v5");
