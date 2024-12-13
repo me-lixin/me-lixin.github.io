@@ -925,10 +925,10 @@ for (const bg of bgArr) {
     }
     caches.match(url).then(async (response) => {
         if (!response) {
-            let resp = await fetch(url);
-            let cache = await caches.open('pictureV1');
-            cache.put(url, resp.clone())
-            return resp.blob();
+            // let resp = await fetch(url);
+            // let cache = await caches.open('pictureV1');
+            // cache.put(url, resp.clone())
+            // return resp.blob();
         } else {
             return response.blob();
         }
@@ -939,7 +939,7 @@ for (const bg of bgArr) {
 
 function registerServiceWorker(){
     if('serviceWorker' in navigator){
-        navigator.serviceWorker.register('/serviceWorker.js').then((result)=>console.log(result)
+        navigator.serviceWorker.register('/serviceWorker.js').then((result)=>console.log('注册成功',result)
         );
     }
 }
