@@ -103,6 +103,7 @@ header {
     position: sticky;
     top: 0rem;
     z-index: 99;
+    border-radius: 0px 0px 30px 30px;
 }
 
 header img {
