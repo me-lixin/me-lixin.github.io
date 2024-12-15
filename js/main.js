@@ -123,7 +123,7 @@ function initalizeDB() {
         selectLog(new Date(now.getFullYear(), now.getMonth(), now.getDate()).valueOf()
             , Date.now());
     }
-    request.onerror = (e) => {
+    request.onerror = () => {
         alert("请允许我的 web 应用使用 IndexedDB！");
     }
     request.onupgradeneeded = (e) => {
@@ -186,7 +186,7 @@ function selectLogToStatistics(offset) {
     let lastMax;
 
     let range;
-    if (offset == 1) {
+    if (offset === 1) {
         current = now.getDate() + 1;
         offsetTem = 30;
         let num = current - offsetTem;
@@ -238,10 +238,10 @@ function selectLogToStatistics(offset) {
                 const year = new Date(item.startDateTime).getFullYear();
                 const month = new Date(item.startDateTime).getMonth();
                 const itemDay = new Date(item.startDateTime).getDate();
-                if (year == list[i].year && month == list[i].month) {
+                if (year === list[i].year && month === list[i].month) {
                     sum += item.duration;
                 }
-                if (month == list[i].month && itemDay == list[i].day) {
+                if (month === list[i].month && itemDay === list[i].day) {
                     sum += item.duration;
                 }
             }
@@ -250,13 +250,13 @@ function selectLogToStatistics(offset) {
         // 初次绘制
         console.log(list);
 
-        initChart(offset == 1 ? 18 : 450);
+        initChart(offset === 1 ? 18 : 450);
     }
 }
 function selectLog(startTime, endTime) {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
-    if (startTime == 0) {
+    if (startTime === 0) {
         return new Promise((resolve) => {
             index.getAll().onsuccess = (e) => {
                 resolve(e.target.result);
@@ -286,7 +286,7 @@ function selectLog(startTime, endTime) {
 }
 
 function updateLog(data) {
-    if (data.duration < 60000) {
+    if (!data.duration || data.duration < 60000) {
         return;
     }
     let store = createStore(DB_MODE, 'skillLog');
@@ -298,7 +298,7 @@ function updateLog(data) {
 }
 function logPanel(data) {
     let firstLog = logInfoDoc.firstElementChild;
-    if (firstLog.textContent != getNowDate(data.startDateTime)) {
+    if (firstLog.textContent !== getNowDate(data.startDateTime)) {
         let newFirstLog = document.createElement('p');
         newFirstLog.innerHTML = `<strong>${getNowDate(data.startDateTime)}</strong>`;
         firstLog.before(newFirstLog);
@@ -427,9 +427,9 @@ function fillPanel(div, data) {
     <h2>${data.skillName}</h2>
     <p>你要用<b>${data.skillTime}</b>个小时来学<strong>[${data.skillName}]</strong>,要是学不会,你将<b>[生不如死]</b>!</p>
     <ul>
-        <li>累计学习:<b>${Math.ceil(data.addUp == 0 ? 0 : data.addUp / 1000 / 60 / 60)}</b>小时</li>
+        <li>累计学习:<b>${Math.ceil(data.addUp === 0 ? 0 : data.addUp / 1000 / 60 / 60)}</b>小时</li>
         <li>今天计划学:<b>${data.todayTime}</b>小时</li>
-        <li>今天已学习:<b>${Math.ceil(data.todayAddUp == 0 ? 0 : data.todayAddUp / 1000 / 60 / 60)}</b>小时</li>
+        <li>今天已学习:<b>${Math.ceil(data.todayAddUp === 0 ? 0 : data.todayAddUp / 1000 / 60 / 60)}</b>小时</li>
         <li>今天还需学:<b>${Math.trunc(data.todayNeedTime <= 0 ? 0 : data.todayNeedTime / 1000 / 60 / 60)}</b>小时</li>
         <li>距离学会还剩:<b>${Math.trunc(data.sumNeedTime <= 0 ? 0 : data.sumNeedTime / 1000 / 60 / 60)}</b>小时</li>
 </ul>
@@ -511,6 +511,7 @@ function onOff(obj) {
         logItem.endDateTime = Date.now();
         logItem.duration = logItem.endDateTime - logItem.startDateTime;
         updateLog(logItem);
+        updateDataToStore(currentPanel);
     } else {
         //开启日志
         logItem.startDateTime = Date.now();
@@ -528,12 +529,12 @@ function run() {
     currentPanel.s++;
     currentPanel.addUp = Number(currentPanel.addUp) + 1000;
     currentPanel.todayAddUp = Number(currentPanel.todayAddUp) + 1000;
-    if (currentPanel.s == 60) {
+    if (currentPanel.s === 60) {
         currentPanel.s = 0;
         currentPanel.m++;
         updateDataToStore(currentPanel);
     }
-    if (currentPanel.m == 60) {
+    if (currentPanel.m === 60) {
         currentPanel.m = 0;
         currentPanel.h++;
     }
@@ -544,11 +545,11 @@ function run() {
 function run2() {
     currentPanel.sumNeedTime = Number(currentPanel.sumNeedTime) - 1000;
     currentPanel.todayNeedTime = Number(currentPanel.todayNeedTime) - 1000;
-    if (currentPanel.m2 == 0 && currentPanel.s2 == 0) {
+    if (currentPanel.m2 === 0 && currentPanel.s2 === 0) {
         currentPanel.m2 = 60;
         currentPanel.h2--;
     }
-    if (currentPanel.s2 == 0) {
+    if (currentPanel.s2 === 0) {
         currentPanel.s2 = 60;
         currentPanel.m2--;
     }
@@ -634,7 +635,7 @@ contentDoc.addEventListener('click', (e) => {
     switchTag(e.target.id)
 })
 //加载更多日志
-loading.addEventListener('click', (e) => {
+loading.addEventListener('click', () => {
     loading.textContent = '加载中......'
     loading.disabled = true;
     setTimeout(() => {
@@ -650,11 +651,10 @@ loading.addEventListener('click', (e) => {
     }, 500);
 })
 // 下载日志
-download.addEventListener('click', async (e) => {
+download.addEventListener('click', async () => {
     const logList = await selectLog(0, Date.now())
     let logStr = '';
     for (const item of logList) {
-        const content = document.createElement('p');
         let hours = Math.trunc(item.duration / 1000 / 60 / 60);
         let minutes = Math.trunc(item.duration / 1000 / 60 % 60);
         logStr += `<br>[${getNowDate(item.startDateTime)} ${getNowTime(item.startDateTime)}]
@@ -700,7 +700,7 @@ function switchTag(tagId) {
 }
 // 监听报表切换
 swtichBtDoc.addEventListener('click', (e) => {
-    if (e.target.textContent == '年') {
+    if (e.target.textContent === '年') {
         e.target.textContent = '月';
         selectLogToStatistics(12);
     } else {
@@ -715,7 +715,13 @@ window.addEventListener('unload', () => {
     updateLog(logItem);
     if (currentPanel) updateDataToStore(currentPanel);
 })
-
+// 监听页面刷新
+window.addEventListener('beforeunload', () => {
+    logItem.endDateTime = Date.now();
+    logItem.duration = logItem.endDateTime - logItem.startDateTime;
+    updateLog(logItem);
+    if (currentPanel) updateDataToStore(currentPanel);
+})
 // 后台运行逻辑
 document.addEventListener('visibilitychange', () => {
     if (document.hidden && onOffDoc.value === 'off') {
@@ -784,19 +790,19 @@ function drawGrid(maxData) {
     offCtx.strokeStyle = '#000';
     offCtx.stroke();
     offCtx.font = '14px monospace';
-    offCtx.fillText(maxData == 18 ? '月度统计' : '年度统计', offscreenCanvas.width / 2, padding / 2);
+    offCtx.fillText(maxData === 18 ? '月度统计' : '年度统计', offscreenCanvas.width / 2, padding / 2);
     offCtx.font = '12px monospace';
 
     // 绘制 X 轴刻度
     list.forEach((item, i) => {
         const x = padding + i * stepX;
-        if (maxData == 18 && i != 0 && i % 4 == 0) {
+        if (maxData === 18 && i !== 0 && i % 4 === 0) {
             offCtx.moveTo(x, offscreenCanvas.height - padding)
             offCtx.lineTo(x, offscreenCanvas.height - padding + 5)
             offCtx.stroke();
             offCtx.fillText(item.day > 9 ? item.day : '0' + item.day, x - 3, offscreenCanvas.height - padding + 20);
         }
-        if (maxData == 450 && i != 0 && i % 2 == 0) {
+        if (maxData === 450 && i !== 0 && i % 2 === 0) {
             offCtx.moveTo(x, offscreenCanvas.height - padding)
             offCtx.lineTo(x, offscreenCanvas.height - padding + 5)
             offCtx.stroke();
@@ -807,13 +813,13 @@ function drawGrid(maxData) {
     // 绘制 Y 轴刻度
     for (let i = 0; i <= maxData; i++) {
         const y = offscreenCanvas.height - padding - (i * stepY);
-        if (maxData == 18 && i != 0 && i % 3 == 0) {
+        if (maxData === 18 && i !== 0 && i % 3 === 0) {
             offCtx.moveTo(padding - 5, y)
             offCtx.lineTo(padding, y)
             offCtx.stroke();
             offCtx.fillText(i > 9 ? i : '0' + i, padding - 22, y + 3);
         }
-        if (maxData == 450 && i != 0 && i % 50 == 0) {
+        if (maxData === 450 && i !== 0 && i % 50 === 0) {
             offCtx.moveTo(padding - 5, y)
             offCtx.lineTo(padding, y)
             offCtx.stroke();
