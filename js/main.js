@@ -105,7 +105,7 @@ function defaultDataFill(data) {
     data.h = data.h || 0;
     data.m = data.m || 0;
     data.s = data.s || 0;
-    data.h2 = Math.trunc((Number(data.todayTime) * 1000 * 60 * 60 - Number(data.todayAddUp)) / 1000 / 60 / 60);
+    data.h2 = data.h2 || Math.trunc((Number(data.todayTime) * 1000 * 60 * 60 - Number(data.todayAddUp)) / 1000 / 60 / 60);
     data.m2 = data.m2 || 0;
     data.s2 = data.s2 || 0;
     data.timerMode = data.timerMode || '0';
