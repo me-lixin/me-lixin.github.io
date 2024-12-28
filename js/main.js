@@ -95,6 +95,7 @@ formDoc.addEventListener('submit', (e) => {
     updateDataToStore(Object.fromEntries(formData))
     contentShow();
 })
+
 //默认数据填充
 function defaultDataFill(data) {
     data.dateTime = Date.now();
@@ -105,11 +106,11 @@ function defaultDataFill(data) {
     data.h = data.h || 0;
     data.m = data.m || 0;
     data.s = data.s || 0;
-    data.h2 = data.h2 || Math.trunc((Number(data.todayTime) * 1000 * 60 * 60 - Number(data.todayAddUp)) / 1000 / 60 / 60);
+    const h2 = Math.trunc((Number(data.todayTime) * 1000 * 60 * 60 - Number(data.todayAddUp)) / 1000 / 60 / 60)
+    data.h2 = data.m2 > 0 ? h2 - 1 : h2;
     data.m2 = data.m2 || 0;
     data.s2 = data.s2 || 0;
     data.timerMode = data.timerMode || '0';
-
 }
 function initalizeDB() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -131,14 +132,15 @@ function initalizeDB() {
         //     e.target.result.deleteObjectStore(DB_STORE_NAME)
         //     e.target.result.deleteObjectStore('skillLog')
         // }
-        let skillDB = e.target.result.createObjectStore(DB_STORE_NAME, { keyPath: 'id' })
-        let logStore = e.target.result.createObjectStore('skillLog', { keyPath: 'id', autoIncrement: true })
-        logStore.createIndex('dateTime', 'dateTime', { unique: true });
-        skillDB.createIndex('dateTime', 'dateTime', { unique: true });
+        let skillDB = e.target.result.createObjectStore(DB_STORE_NAME, {keyPath: 'id'})
+        let logStore = e.target.result.createObjectStore('skillLog', {keyPath: 'id', autoIncrement: true})
+        logStore.createIndex('dateTime', 'dateTime', {unique: true});
+        skillDB.createIndex('dateTime', 'dateTime', {unique: true});
         console.log('数据库构建');
 
     }
 }
+
 function createStore(mode, storeName) {
     return mode ? db.transaction(storeName, mode).objectStore(storeName) :
         db.transaction(storeName).objectStore(storeName);
@@ -156,6 +158,7 @@ function selectDataFromStore() {
     }
     console.log('数据加载请求成功');
 }
+
 function updateDataToStore(data) {
     let store = createStore(DB_MODE, DB_STORE_NAME)
     defaultDataFill(data);
@@ -164,6 +167,7 @@ function updateDataToStore(data) {
         dataToElement(data);
     };
 }
+
 function deleteSkill(dataId) {
     let store = createStore(DB_MODE, DB_STORE_NAME)
     return new Promise((resolve) => {
@@ -173,6 +177,7 @@ function deleteSkill(dataId) {
         };
     })
 }
+
 function selectLogToStatistics(offset) {
     list = [];
     const store = createStore('readonly', 'skillLog');
@@ -253,6 +258,7 @@ function selectLogToStatistics(offset) {
         initChart(offset === 1 ? 18 : 450);
     }
 }
+
 function selectLog(startTime, endTime) {
     const store = createStore('readonly', 'skillLog');
     const index = store.index('dateTime');
@@ -296,6 +302,7 @@ function updateLog(data) {
         console.log('log数据添加成功', e.target.result);
     };
 }
+
 function logPanel(data) {
     let firstLog = logInfoDoc.firstElementChild;
     if (firstLog.textContent !== getNowDate(data.startDateTime)) {
@@ -312,6 +319,7 @@ function logPanel(data) {
     </strong> <b>${hours}</b>小时<b>${minutes}</b>分钟`;
     firstLog.after(content);
 }
+
 function dataToElement(item) {
     dataMap.set(item.id, item);
     constructorPanel(item)
@@ -323,6 +331,7 @@ for (const range of rangeDoc) {
         updateDuration(range)
     })
 }
+
 function updateDuration(range) {
     if (range.value >= 200) {
         durationDoc[0].textContent = range.value;
@@ -389,6 +398,7 @@ sectionDoc.addEventListener('click', async (e) => {
         contentShow('skill');
     }
 })
+
 function contentShow(type) {
     switch (type) {
         case 'skill':
@@ -422,6 +432,7 @@ function contentShow(type) {
             }
     }
 }
+
 function fillPanel(div, data) {
     div.innerHTML = `
     <h2>${data.skillName}</h2>
@@ -437,6 +448,7 @@ function fillPanel(div, data) {
 <button value=${data.id} type="button" class="start-skill on"></button>`
 
 }
+
 function fillForm(item) {
     for (const key in item) {
         let input = document.getElementById(key)
@@ -491,10 +503,12 @@ reset.addEventListener('click', (e) => {
 
     updateDataToStore(currentPanel);
 })
+
 function getNowTime(value) {
     const date = new Date(value);
     return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
 }
+
 function getNowDate(value) {
     const date = new Date(value);
     return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
@@ -556,10 +570,12 @@ function run2() {
     currentPanel.s2--;
     timeShows[1].textContent = `${currentPanel.h2.toString().padStart(2, '0')}:${currentPanel.m2.toString().padStart(2, '0')}:${currentPanel.s2.toString().padStart(2, '0')}`;
 }
+
 timerBtMode.addEventListener('click', (e) => {
     e.stopPropagation()
     timerModeSwitch(e.target);
 })
+
 function timerModeSwitch(modeDiv) {
     if (modeDiv.textContent === '倒计时') {
         modeDiv.textContent = '正计时';
@@ -575,6 +591,7 @@ function timerModeSwitch(modeDiv) {
         maskDivDocs[1].style.display = 'block';
     }
 }
+
 // 键盘事件
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
@@ -661,13 +678,14 @@ download.addEventListener('click', async () => {
         学习<strong>[${item.skillName}]
         </strong> <b>${hours}</b>小时<b>${minutes}</b>分钟`;
     }
-    const blob = new Blob([logStr], { type: "text/html" });
+    const blob = new Blob([logStr], {type: "text/html"});
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = '日志.html';
     link.click();
 
 });
+
 function switchTag(tagId) {
     switch (tagId) {
         case 'log':
@@ -698,6 +716,7 @@ function switchTag(tagId) {
             break;
     }
 }
+
 // 监听报表切换
 swtichBtDoc.addEventListener('click', (e) => {
     if (e.target.textContent === '年') {
@@ -735,6 +754,7 @@ document.addEventListener('visibilitychange', () => {
         restorationTiem();
     }
 });
+
 function restorationTiem() {
     let timeDifference = Date.now() - timeStamp;
     // let timeDifference = MILLISECOND/24 ;
@@ -853,6 +873,7 @@ function drawLine(maxData) {
     offCtx.lineWidth = 2;
     offCtx.stroke();
 }
+
 // 绘制数据点
 function drawDataPoints(maxData) {
     const padding = 30;
@@ -866,7 +887,7 @@ function drawDataPoints(maxData) {
     list.forEach((point, i) => {
         const x = padding + i * stepX;
         const y = offscreenCanvas.height - padding - (point.data * stepY);
-        dataXY.push({ 'x': x, 'y': y })
+        dataXY.push({'x': x, 'y': y})
         offCtx.beginPath();
         offCtx.arc(x, y, 2, 0, 2 * Math.PI);
         offCtx.fillStyle = '#a22a2a';
@@ -875,6 +896,7 @@ function drawDataPoints(maxData) {
     offCtx.fillStyle = '#000';
 
 }
+
 // 显示 Tooltip
 function showTooltip(event) {
     const padding = 30;
@@ -918,6 +940,7 @@ function initChart(maxData) {
     drawDataPoints(maxData);
     ctx.drawImage(offscreenCanvas, 0, 0);
 }
+
 // 监听鼠标移动事件
 canvas.addEventListener('mousemove', showTooltip);
 
@@ -943,10 +966,11 @@ for (const bg of bgArr) {
     })
 }
 
-function registerServiceWorker(){
-    if('serviceWorker' in navigator){
-        navigator.serviceWorker.register('/serviceWorker.js').then((result)=>console.log('注册成功',result)
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/serviceWorker.js').then((result) => console.log('注册成功', result)
         );
     }
 }
+
 registerServiceWorker();
