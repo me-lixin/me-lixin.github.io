@@ -106,12 +106,12 @@ function defaultDataFill(data) {
     data.h = data.h || 0;
     data.m = data.m || 0;
     data.s = data.s || 0;
-    const h2 = Math.trunc((Number(data.todayTime) * 1000 * 60 * 60 - Number(data.todayAddUp)) / 1000 / 60 / 60)
-    data.h2 = data.m2 > 0 ? h2 - 1 : h2;
+    data.h2 = Number(data.todayTime) - Math.ceil(Number(data.todayAddUp / 1000 / 60 / 60));
     data.m2 = data.m2 || 0;
     data.s2 = data.s2 || 0;
     data.timerMode = data.timerMode || '0';
 }
+
 function initalizeDB() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onsuccess = (e) => {
@@ -592,28 +592,27 @@ function timerModeSwitch(modeDiv) {
     }
 }
 
+//退出面板保存当前的计时
+function saveState() {
+    //看板更新
+    maskBtDoc.style.visibility = 'hidden';
+    fillForm(currentPanel);
+    clearInterval(intervalId);
+    clearInterval(intervalId2);
+    //日志
+    if (onOffDoc.value === 'off') {
+        logItem.endDateTime = Date.now();
+        logItem.duration = logItem.endDateTime - logItem.startDateTime;
+        onOff(onOffDoc)
+    }
+}
+
 // 键盘事件
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
     console.log(e.code);
-
     if (e.code === 'Escape') {
-        //看板更新
-        // const div = document.getElementById(currentPanel.id);
-        // fillPanel(div, currentPanel);
-        maskBtDoc.style.visibility = 'hidden';
-        fillForm(currentPanel);
-        clearInterval(intervalId);
-        clearInterval(intervalId2);
-        //数据库更新
-        updateDataToStore(currentPanel);
-
-        //日志
-        if (onOffDoc.value === 'off') {
-            logItem.endDateTime = Date.now();
-            logItem.duration = logItem.endDateTime - logItem.startDateTime;
-            onOff(onOffDoc)
-        }
+        saveState();
     } else if (e.code === 'Space') {
         onOff(onOffDoc);
     } else if (e.code === 'Tab') {
@@ -623,24 +622,8 @@ maskBtDoc.addEventListener('keydown', (e) => {
 // 蒙版双击事件
 maskBtDoc.addEventListener('click', () => {
     touchCount++;
-    console.log(touchCount);
-
     if (touchCount > 1) {
-        //看板更新
-        maskBtDoc.style.visibility = 'hidden';
-
-        fillForm(currentPanel);
-        clearInterval(intervalId);
-        clearInterval(intervalId2);
-        //数据库更新
-        updateDataToStore(currentPanel);
-
-        //日志
-        if (onOffDoc.value === 'off') {
-            logItem.endDateTime = Date.now();
-            logItem.duration = logItem.endDateTime - logItem.startDateTime;
-            onOff(onOffDoc)
-        }
+        saveState()
     }
     setTimeout(() => {
         touchCount = 0;
@@ -757,7 +740,6 @@ document.addEventListener('visibilitychange', () => {
 
 function restorationTiem() {
     let timeDifference = Date.now() - timeStamp;
-    // let timeDifference = MILLISECOND/24 ;
     let h = Math.trunc(timeDifference / 1000 / 60 / 60);
     let m = Math.trunc(timeDifference / 1000 / 60 % 60);
     let s = Math.trunc(timeDifference / 1000 % 60);
