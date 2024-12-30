@@ -162,6 +162,7 @@ function selectDataFromStore() {
 function updateDataToStore(data) {
     let store = createStore(DB_MODE, DB_STORE_NAME)
     defaultDataFill(data);
+    console.log(data)
     store.put(data).onsuccess = (e) => {
         console.log('数据更新成功', e.target.result);
         dataToElement(data);
@@ -559,11 +560,11 @@ function run() {
 function run2() {
     currentPanel.sumNeedTime = Number(currentPanel.sumNeedTime) - 1000;
     currentPanel.todayNeedTime = Number(currentPanel.todayNeedTime) - 1000;
-    if (currentPanel.m2 === 0 && currentPanel.s2 === 0) {
+    if (currentPanel.m2 == 0 && currentPanel.s2 == 0) {
         currentPanel.m2 = 60;
         currentPanel.h2--;
     }
-    if (currentPanel.s2 === 0) {
+    if (currentPanel.s2 == 0) {
         currentPanel.s2 = 60;
         currentPanel.m2--;
     }
