@@ -200,9 +200,10 @@ function selectLogToStatistics(offset) {
         for (let i = 0; i < offsetTem; i++) {
             if (num <= 0) {
                 let lastDay = lastMax + num;
+                const month = !now.getMonth() && 12
                 list.push({
-                    'label': `${now.getMonth().toString().padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`
-                    , 'month': now.getMonth() - 1, 'day': lastDay
+                    'label': `${month.toString().padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`
+                    , 'month': month - 1, 'day': lastDay
                 });
                 num++;
             } else {
@@ -926,28 +927,6 @@ function initChart(maxData) {
 
 // 监听鼠标移动事件
 canvas.addEventListener('mousemove', showTooltip);
-
-// 缓存图片资源
-for (const bg of bgArr) {
-    let url;
-    if (bg === 'background') {
-        url = 'images/' + bg + '.jpg'
-    } else {
-        url = 'images/' + bg + '.svg'
-    }
-    caches.match(url).then(async (response) => {
-        if (!response) {
-            // let resp = await fetch(url);
-            // let cache = await caches.open('pictureV1');
-            // cache.put(url, resp.clone())
-            // return resp.blob();
-        } else {
-            return response.blob();
-        }
-    }).then(blob => {
-        if (blob) root.style.setProperty('--' + bg + '-bg', `url('${URL.createObjectURL(blob)}')`);
-    })
-}
 
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
