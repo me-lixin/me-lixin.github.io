@@ -930,7 +930,7 @@ canvas.addEventListener('mousemove', showTooltip);
 
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/serviceWorker.js').then((result) => console.log('注册成功', result)
+        navigator.serviceWorker.register('/serviceWorkerCache.js').then((result) => console.log('注册成功', result)
         );
     }
 }
