@@ -62,11 +62,6 @@ header,
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), center / cover no-repeat url('/images/background.jpg');
  }
 
-/* 隐藏类 */
-.display-none {
-    display: none;
-}
-
 .background-tag {
     background-color: #eee;
 }
@@ -469,6 +464,23 @@ footer {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+/*导出样式*/
+.export-import{
+    display: flex;
+    justify-content: space-around;
+    height: 7rem;
+    width: 13rem;
+    background: #a2aba8;
+    position: fixed;
+    top:50%;
+    left:50%;
+    transform: translateY(-50%) translateX(-50%);
+    opacity: 0.6;
+}
+/* 隐藏类 */
+.display-none {
+    display: none;
 }
 
 /* 浏览器视口宽度小于650px*/
