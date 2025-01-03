@@ -169,6 +169,11 @@ function updateDataToStore(data) {
     };
 }
 
+function addAllSkill(data) {
+        let store = createStore(DB_MODE, DB_STORE_NAME)
+        data.forEach(item => store.put(item));
+}
+
 function deleteSkill(dataId) {
     let store = createStore(DB_MODE, DB_STORE_NAME)
     return new Promise((resolve) => {
@@ -303,6 +308,10 @@ function updateLog(data) {
         logPanel(data);
         console.log('log数据添加成功', e.target.result);
     };
+}
+function addAllLog(data) {
+    let store = createStore(DB_MODE, 'skillLog');
+    data.forEach(item=>store.put(item));
 }
 
 function logPanel(data) {
@@ -629,20 +638,13 @@ eiport.addEventListener('click', async (e) => {
         const [fileHandle] = await window.showOpenFilePicker(pickerOpts);
         // 获取文件内容
         const fileData = await fileHandle.getFile();
-        console.log(fileData)
         const fileReader = new FileReader();
         fileReader.addEventListener('load',()=>{
             const parse = JSON.parse(fileReader.result);
             if (fileData.name.includes('日志')){
-                for (const log of parse) {
-                    updateLog(log)
-                }
-                console.log(parse)
+                addAllLog(parse)
             }else {
-                for (const skill of parse) {
-                    updateDataToStore(skill)
-                }
-                console.log(parse)
+                addAllSkill(parse)
             }
         })
         fileReader.readAsText(fileData)
