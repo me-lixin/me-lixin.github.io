@@ -29,7 +29,7 @@ self.addEventListener("install", (event) => {
 });
 //将页面放进缓存
 const addResourcesToCache = async (resources) => {
-    const cache = await caches.open("v2");
+    const cache = await caches.open("v3");
     await cache.addAll(resources);
 };
 //监听激活
