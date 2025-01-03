@@ -47,8 +47,8 @@ let intervalId;
 let intervalId2;
 let dataXY = [];
 // 缓存图片资源
-const root = document.querySelector(':root');
-const bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
+// const root = document.querySelector(':root');
+// const bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
 
 
 formDoc.addEventListener('reset', () => {
@@ -609,6 +609,81 @@ function saveState() {
     }
 }
 
+let key = '';
+const eiport = document.querySelector('#eiport');
+eiport.addEventListener('click', async (e) => {
+    e.stopPropagation()
+    if (e.target.className === 'import') {
+        const pickerOpts = {
+            types: [
+                {
+                    accept: {
+                        "text/*": [".json"],
+                    },
+                },
+            ],
+            excludeAcceptAllOption: true,
+            multiple: false,
+        };
+        // 打开文件选择器
+        const [fileHandle] = await window.showOpenFilePicker(pickerOpts);
+        // 获取文件内容
+        const fileData = await fileHandle.getFile();
+        console.log(fileData)
+        const fileReader = new FileReader();
+        fileReader.addEventListener('load',()=>{
+            const parse = JSON.parse(fileReader.result);
+            if (fileData.name.includes('日志')){
+                for (const log of parse) {
+                    updateLog(log)
+                }
+                console.log(parse)
+            }else {
+                for (const skill of parse) {
+                    updateDataToStore(skill)
+                }
+                console.log(parse)
+            }
+        })
+        fileReader.readAsText(fileData)
+
+    }
+    if (e.target.className === 'export') {
+        const logList = await selectLog(0, Date.now())
+        const blob = new Blob([JSON.stringify(logList)], {type: "text/json"});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = '日志.json';
+        link.click();
+        let store = createStore('readonly', DB_STORE_NAME);
+        store.getAll().onsuccess = (e) => {
+            const blob = new Blob([JSON.stringify(e.target.result)], {type: "text/json"});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '技能.json';
+            link.click();
+        }
+
+    }
+})
+window.addEventListener('keydown', (e) => {
+
+    key += e.key
+    console.log(key)
+    if (key === 'Metae') {
+        console.log('组合', key)
+        eiport.classList.toggle('display-none', false)
+    }
+    if (key === 'Escape') {
+        console.log('组合', key)
+        eiport.classList.toggle('display-none', true)
+
+    }
+    setTimeout(() => {
+        key = '';
+    }, 800)
+
+})
 // 键盘事件
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
