@@ -46,6 +46,9 @@ let timeStamp;
 let intervalId;
 let intervalId2;
 let dataXY = [];
+//导入导出
+let key = '';
+const eiport = document.querySelector('#eiport');
 // 缓存图片资源
 // const root = document.querySelector(':root');
 // const bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
@@ -582,6 +585,7 @@ function run2() {
     timeShows[1].textContent = `${currentPanel.h2.toString().padStart(2, '0')}:${currentPanel.m2.toString().padStart(2, '0')}:${currentPanel.s2.toString().padStart(2, '0')}`;
 }
 
+
 timerBtMode.addEventListener('click', (e) => {
     e.stopPropagation()
     timerModeSwitch(e.target);
@@ -617,9 +621,7 @@ function saveState() {
         onOff(onOffDoc)
     }
 }
-
-let key = '';
-const eiport = document.querySelector('#eiport');
+//文件导入导出
 eiport.addEventListener('click', async (e) => {
     e.stopPropagation()
     if (e.target.className === 'import') {
@@ -668,21 +670,31 @@ eiport.addEventListener('click', async (e) => {
 
     }
 })
+//监听打开文件导入导出面板
 window.addEventListener('keydown', (e) => {
-
     key += e.key
-    console.log(key)
-    if (key === 'Metae') {
-        console.log('组合', key)
+    if (key === 'Controle') {
         eiport.classList.toggle('display-none', false)
     }
     if (key === 'Escape') {
-        console.log('组合', key)
         eiport.classList.toggle('display-none', true)
-
     }
     setTimeout(() => {
         key = '';
+    }, 800)
+
+})
+
+window.addEventListener('click', (e) => {
+    touchCount++;
+    if (touchCount === 3) {
+        eiport.classList.toggle('display-none', false)
+    }
+    if (touchCount === 2) {
+        eiport.classList.toggle('display-none', true)
+    }
+    setTimeout(() => {
+        touchCount = '';
     }, 800)
 
 })
