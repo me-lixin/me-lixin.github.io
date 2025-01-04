@@ -139,6 +139,24 @@ function initalizeDB() {
         let logStore = e.target.result.createObjectStore('skillLog', {keyPath: 'id', autoIncrement: true})
         logStore.createIndex('dateTime', 'dateTime', {unique: true});
         skillDB.createIndex('dateTime', 'dateTime', {unique: true});
+        skillDB.add({
+            "skillName": "英语",
+            "skillTime": "1000",
+            "todayTime": "3",
+            "id": "-1",
+            "dateTime": 1735957906417,
+            "addUp": 0,
+            "todayAddUp": 0,
+            "todayNeedTime": 10800000,
+            "sumNeedTime": 3600000000,
+            "h": 0,
+            "m": 0,
+            "s": 0,
+            "h2": 3,
+            "m2": 0,
+            "s2": 0,
+            "timerMode": "0"
+        })
         console.log('数据库构建');
 
     }
@@ -150,7 +168,7 @@ function createStore(mode, storeName) {
 }
 
 function selectDataFromStore() {
-    let store = createStore('readonly', DB_STORE_NAME);
+    let store = createStore(DB_MODE, DB_STORE_NAME);
     const index = store.index('dateTime');
     index.openCursor().onsuccess = (e) => {
         const cursor = e.target.result
