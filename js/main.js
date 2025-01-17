@@ -50,9 +50,6 @@ let dataXY = [];
 let key = '';
 const eiport = document.querySelector('#eiport');
 // 缓存图片资源
-// const root = document.querySelector(':root');
-// const bgArr = ['background', 'add', 'delete', 'increase', 'menu', 'reduce', 'reset', 'start', 'stop', 'return'];
-
 
 formDoc.addEventListener('reset', () => {
     durationDoc[0].textContent = '600';
@@ -131,10 +128,6 @@ function initalizeDB() {
         alert("请允许我的 web 应用使用 IndexedDB！");
     }
     request.onupgradeneeded = (e) => {
-        // if (e.oldVersion > 0) {
-        //     e.target.result.deleteObjectStore(DB_STORE_NAME)
-        //     e.target.result.deleteObjectStore('skillLog')
-        // }
         let skillDB = e.target.result.createObjectStore(DB_STORE_NAME, {keyPath: 'id'})
         let logStore = e.target.result.createObjectStore('skillLog', {keyPath: 'id', autoIncrement: true})
         logStore.createIndex('dateTime', 'dateTime', {unique: true});
@@ -327,6 +320,7 @@ function updateLog(data) {
     data.dateTime = data.startDateTime;
     store.put(data).onsuccess = (e) => {
         logPanel(data);
+        selectLogToStatistics(1)
         console.log('log数据添加成功', e.target.result);
     };
 }
@@ -519,7 +513,6 @@ onOffDoc.addEventListener('click', (e) => {
 // 重置今日数据
 reset.addEventListener('click', (e) => {
     e.stopPropagation()
-    //保存日志
     //重置当前数据
     currentPanel.h = 0;
     currentPanel.todayAddUp = 0;
