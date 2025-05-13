@@ -212,6 +212,8 @@ function selectLogToStatistics(offset) {
 
     let range;
     if (offset === 1) {
+        debugger
+
         current = now.getDate() + 1;
         offsetTem = 30;
         let num = current - offsetTem;
@@ -219,7 +221,7 @@ function selectLogToStatistics(offset) {
         for (let i = 0; i < offsetTem; i++) {
             if (num <= 0) {
                 let lastDay = lastMax + num;
-                const month = !now.getMonth() && 12
+                const month = now.getMonth()===0 ? 12 : now.getMonth();
                 list.push({
                     'label': `${month.toString().padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`
                     , 'month': month - 1, 'day': lastDay
@@ -238,6 +240,7 @@ function selectLogToStatistics(offset) {
         current = now.getMonth() + 1;
         let num = current - offsetTem;
         lastMax = new Date(now.getFullYear(), 0, 0).getMonth() + 1;
+        debugger
         for (let i = 0; i < offsetTem; i++) {
             if (num < 0) {
                 let month = lastMax + num;
@@ -712,7 +715,6 @@ window.addEventListener('click', (e) => {
 // 键盘事件
 maskBtDoc.addEventListener('keydown', (e) => {
     e.preventDefault();
-    console.log(e.code);
     if (e.code === 'Escape') {
         saveState();
     } else if (e.code === 'Space') {
